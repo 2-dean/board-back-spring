@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.repository.BoardRepository">
+
+    <insert id="save" parameterType="com.board.domain.Board">
+        INSERT INTO BOARD (BNUM, TITLE, CONTENT, NAME)
+        VALUES (
+                IFNULL((SELECT MAX(B.BNUM) FROM BOARD B ), 0) + 1,
+                #{title}, #{content}, #{name}
+        )
+    </insert>
+
+    <select id="getBoardList" resultType="com.board.domain.Board">
+        SELECT *
+        FROM BOARD
+    </select>
+
+    <select id="getBoardOne" parameterType="int" resultType="com.board.domain.Board">
+        SELECT *
+        FROM BOARD
+        WHERE BNUM = #{bnum}
+    </select>
+    <!-- 제목, 작성자 -->
+    <select id="findBoardByTitle" parameterType="Map">
+        SELECT * FROM BOARD WHERE NAME = #{title}
+    </select>
+
+    <update id="modifyBoard" parameterType="com.board.domain.Board">
+        UPDATE BOARD
+        SET TITLE = #{title}, CONTENT =  #{content}, EDITDATE = CURRENT_TIMESTAMP()
+        WHERE BNUM = #{bnum} AND BNUM = #{bnum}
+    </update>
+
+    <delete id="deleteBoard" parameterType="com.board.domain.Board">
+        DELETE FROM BOARD
+        WHERE TITLE = #{title} AND NAME = #{name}
+    </delete>
+
+</mapper>
