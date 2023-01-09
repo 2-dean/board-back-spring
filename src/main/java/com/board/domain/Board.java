@@ -1,61 +1,23 @@
 package com.board.domain;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.Date;
+
+
+@Getter
+@Setter
+@ToString
 public class Board {
 
-    private int bnum;
+    private Long idx;
     private String title;
     private String content;
     private String name;
-    private String regdate;
+    private Date saveDate;
+    private Date editDate;
 
-    public int getBnum() {
-        return bnum;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRegdate() {
-        return regdate;
-    }
-
-    public void setBnum(int bnum) {
-        this.bnum = bnum;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setRegdate(String regdate) {
-        this.regdate = regdate;
-    }
-
-    @Override
-    public String toString() {
-        return "Board{" +
-                "bnum=" + bnum +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", name='" + name + '\'' +
-                ", regdate='" + regdate + '\'' +
-                '}';
-    }
 }

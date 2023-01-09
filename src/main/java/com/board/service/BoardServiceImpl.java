@@ -12,7 +12,7 @@ import java.util.Optional;
 public class BoardServiceImpl implements BoardService{
 
     private BoardRepository boardRepository;
-    @Autowired
+//    @Autowired
     public BoardServiceImpl(BoardRepository boardRepository) {
         this.boardRepository = boardRepository;
     }
@@ -33,12 +33,12 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public Optional<List<Board>> findBoardByTitle(String title) {
+    public List<Board> findBoardByTitle(String title) {
         return boardRepository.findBoardByTitle(title);
     }
 
     @Override
-    public Optional<List<Board>> findBoardByWriter(String name) {
+    public List<Board> findBoardByWriter(String name) {
         return boardRepository.findBoardByWriter(name);
     }
 

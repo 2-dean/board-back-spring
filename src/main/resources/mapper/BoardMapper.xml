@@ -2,39 +2,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.board.repository.BoardRepository">
-
-    <insert id="save" parameterType="com.board.domain.Board">
-        INSERT INTO BOARD (BNUM, TITLE, CONTENT, NAME)
-        VALUES (
-                IFNULL((SELECT MAX(B.BNUM) FROM BOARD B ), 0) + 1,
-                #{title}, #{content}, #{name}
-        )
+    <insert id="save" parameterType="Board">
+        INSERT INTO BOARD (TITLE, CONTENT, NAME)
+        VALUES (#{title}, #{content}, #{name})
     </insert>
 
-    <select id="getBoardList" resultType="com.board.domain.Board">
-        SELECT *
+    <select id="getBoardList" resultType="Board">
+        SELECT idx, title, content, name, save_date, modify_date
         FROM BOARD
     </select>
 
-    <select id="getBoardOne" parameterType="int" resultType="com.board.domain.Board">
-        SELECT *
+    <select id="getBoardOne" parameterType="int" resultType="Board">
+        SELECT idx, title, content, name, save_date, modify_date
         FROM BOARD
         WHERE BNUM = #{bnum}
     </select>
-    <!-- 제목, 작성자 -->
-    <select id="findBoardByTitle" parameterType="Map">
-        SELECT * FROM BOARD WHERE NAME = #{title}
+
+
+    <!-- 검색 -->
+    <select id="findBoardByTitle" parameterType="String" resultType="Board">
+        SELECT *
+        FROM BOARD
+        WHERE TITLE = #{title}
     </select>
 
-    <update id="modifyBoard" parameterType="com.board.domain.Board">
+    <select id="findBoardByWriter" parameterType="String" resultType="Board">
+        SELECT *
+        FROM BOARD
+        WHERE NAME = #{name}
+    </select>
+
+    <update id="modifyBoard" parameterType="Board">
         UPDATE BOARD
         SET TITLE = #{title}, CONTENT =  #{content}, EDITDATE = CURRENT_TIMESTAMP()
-        WHERE BNUM = #{bnum} AND BNUM = #{bnum}
+        WHERE BNUM = #{bnum} AND NAME = #{name} AND PASSWORD = #{password}
     </update>
 
-    <delete id="deleteBoard" parameterType="com.board.domain.Board">
+    <delete id="deleteBoard" parameterType="Board">
         DELETE FROM BOARD
-        WHERE TITLE = #{title} AND NAME = #{name}
+        WHERE BNUM = #{bnum} AND PASSWORD = #{password}
     </delete>
 
 </mapper>
