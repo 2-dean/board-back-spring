@@ -18,6 +18,6 @@ public class Board {
     private String content;
     private String name;
     private Date saveDate;
-    private Date editDate;
+    private Date modifyDate;
 
 }

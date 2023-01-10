@@ -7,15 +7,17 @@ import java.util.Optional;
 
 
 public interface BoardService {
-    int save(Board board);
-    List<Board> getBoardList();
-    Board getBoardOne(int bnum);
+    int saveBoard(Board board);
+    Object getBoardList();
+    Object getBoardOne(Long idx);
 
     //Optional<List<Board>> findBoardByTitle(String title);
-    List<Board> findBoardByTitle(String title);
-    List<Board> findBoardByWriter(String name);
+    Optional<List<Board>> findBoardByTitle(String title);
+    Optional<List<Board>> findBoardByName(String name);
+
+    int modifyBoard(Long idx);
+
+    int deleteBoard(Long idx);
 
     int modifyBoard(Board board);
-
-    int deleteBoard(Board board);
 }
