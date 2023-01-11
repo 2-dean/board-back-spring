@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.board.repository.BoardMapper">
+<mapper namespace="com.board.board.mapper.BoardMapper">
 
     <insert id="saveBoard" parameterType="Board">
         INSERT INTO board (title, content, name)
@@ -14,9 +14,10 @@
     <select id="getBoardList" resultType="Board">
         SELECT idx, title, content, name, save_date, modify_date
         FROM board
+        ORDER BY save_date DESC
     </select>
 
-    <select id="getBoardOne" parameterType="int" resultType="Board">
+    <select id="getBoardOne" parameterType="Long" resultType="Board">
         SELECT idx, title, content, name, save_date, modify_date
         FROM board
         WHERE idx = #{idx}
@@ -28,21 +29,23 @@
         SELECT idx, title, content, name, save_date, modify_date
         FROM board
         WHERE title LIKE  CONCAT ('%' + #{title} + '%')
+        ORDER BY save_date DESC
     </select>
 
     <select id="findBoardByName" parameterType="String" resultType="Board">
         SELECT idx, title, content, name, save_date, modify_date
         FROM board
         WHERE name LIKE CONCAT ('%' + #{name} + '%')
+        ORDER BY save_date DESC
     </select>
 
-    <update id="modifyBoard" parameterType="Lin">
+    <update id="modifyBoard" parameterType="Map">
         UPDATE board
         SET title = #{title}, content =  #{content}, modify_date = current_timestamp()
         WHERE idx = #{idx}
     </update>
 
-    <delete id="deleteBoard" parameterType="Board">
+    <delete id="deleteBoard" parameterType="Long">
         DELETE FROM board
         WHERE  idx = #{idx}
     </delete>

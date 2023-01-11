@@ -1,8 +1,9 @@
-package com.board.service;
+package com.board.board.service;
 
-import com.board.domain.Board;
+import com.board.board.domain.Board;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -15,9 +16,8 @@ public interface BoardService {
     Optional<List<Board>> findBoardByTitle(String title);
     Optional<List<Board>> findBoardByName(String name);
 
-    int modifyBoard(Long idx);
+    int modifyBoard(Map<String, Object> modifyBoard);
 
     int deleteBoard(Long idx);
 
-    int modifyBoard(Board board);
 }

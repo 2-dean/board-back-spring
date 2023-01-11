@@ -1,4 +1,4 @@
-package com.board.domain;
+package com.board.board.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

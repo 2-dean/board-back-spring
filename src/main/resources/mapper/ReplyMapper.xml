@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.board.mapper.ReplyMapper">
+
+    <!-- 댓글 작성 -->
+    <insert id="saveReply" parameterType="Reply">
+        INSERT INTO reply (board_idx, name,content)
+        VALUES (
+                #{boardIdx},
+                #{name},
+                #{content})
+    </insert>
+
+    <!-- 게시글 중 내가 작성한 댓글 -->
+    <select id="getMyReplies" parameterType="Map" resultType="Reply">
+        SELECT idx, board_idx, name, content, save_date
+        FROM reply
+        WHERE board_idx = #{boardIdx} AND name = #{name}
+        ORDER BY save_date DESC
+    </select>
+
+    <!-- 댓글 수정 -->
+    <update id="modifyReply" parameterType="Map">
+        UPDATE reply
+        SET name = #{name}, content =  #{content}
+        WHERE idx = #{idx}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <delete id="deleteReply" parameterType="Long">
+        DELETE FROM reply
+        WHERE idx = #{idx}
+    </delete>
+
+    <!-- 내가 작성한 댓글 전체 삭제 -->
+    <delete id="deleteMyReplies" parameterType="Map">
+        DELETE FROM reply
+        WHERE board_idx = #{boardIdx} AND name = #{name}
+    </delete>
+
+</mapper>

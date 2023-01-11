@@ -1,23 +1,20 @@
-package com.board.service;
+package com.board.board.service;
 
-import com.board.domain.Board;
-import com.board.repository.BoardMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.board.board.domain.Board;
+import com.board.board.mapper.BoardMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 //비즈니스 로직 작성
 @Service
+@RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService{
 
-
-    private BoardMapper boardMapper;
-    @Autowired
-    public BoardServiceImpl(BoardMapper boardMapper) {
-        this.boardMapper = boardMapper;
-    }
+    private final BoardMapper boardMapper;
 
     @Override
     public int saveBoard(Board board) {
@@ -48,31 +45,18 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public Optional<List<Board>> findBoardByTitle(String title) {
         Optional<List<Board>> result = Optional.ofNullable(boardMapper.findBoardByTitle(title));
-
-      /*  if (result.get().size() > 0) {
-            return result.get();
-        } else {
-            return "검색결과없음";
-        }*/
         return result;
     }
 
     @Override
     public Optional<List<Board>> findBoardByName(String name) {
         Optional<List<Board>> result = Optional.ofNullable(boardMapper.findBoardByName(name));
-
-        /*  if (result.get().size() > 0) {
-            return result.get();
-        } else {
-            return "검색결과없음";
-        }*/
-
         return result;
     }
 
     @Override
-    public Long modifyBoard(Long idx) {
-        return boardMapper.modifyBoard(idx);
+    public int modifyBoard(Map<String, Object> modifyBoard) {
+        return boardMapper.modifyBoard(modifyBoard);
     }
 
     @Override

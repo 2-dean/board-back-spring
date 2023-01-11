@@ -1,9 +1,10 @@
-package com.board.repository;
+package com.board.board.mapper;
 
-import com.board.domain.Board;
+import com.board.board.domain.Board;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface BoardMapper {
@@ -22,7 +23,7 @@ public interface BoardMapper {
     List<Board> findBoardByName(String name);
 
     //게시글 수정
-    Long modifyBoard(Long idx);
+    int modifyBoard(Map<String, Object> modifyBoard);
 
     //게시글 삭제
     int deleteBoard(Long idx);
