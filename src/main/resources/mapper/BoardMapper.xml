@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.board.board.mapper.BoardMapper">
+<mapper namespace="com.board.mapper.BoardMapper">
+
+    <insert id="saveFileBoard" parameterType="Board">
+        INSERT INTO board (title, content, name)
+        VALUES (
+                   #{title},
+                   #{content},
+                   #{name})
+    </insert>
 
     <insert id="saveBoard" parameterType="Board">
         INSERT INTO board (title, content, name)
@@ -28,14 +36,14 @@
     <select id="findBoardByTitle" parameterType="String" resultType="Board">
         SELECT idx, title, content, name, save_date, modify_date
         FROM board
-        WHERE title LIKE  CONCAT ('%' + #{title} + '%')
+        WHERE title LIKE  CONCAT ('%',#{title},'%')
         ORDER BY save_date DESC
     </select>
 
     <select id="findBoardByName" parameterType="String" resultType="Board">
         SELECT idx, title, content, name, save_date, modify_date
         FROM board
-        WHERE name LIKE CONCAT ('%' + #{name} + '%')
+        WHERE name LIKE CONCAT ('%', #{name}, '%')
         ORDER BY save_date DESC
     </select>
 

@@ -1,4 +1,4 @@
-package com.board.reply.domain;
+package com.board.domain;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import lombok.ToString;
 public class Reply {
 
     private Long idx;
-    private Long bordIdx;
+    private Long boardIdx;
     private String name;
     private String content;
     private String saveDate;

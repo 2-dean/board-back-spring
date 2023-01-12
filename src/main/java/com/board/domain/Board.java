@@ -1,11 +1,8 @@
-package com.board.board.domain;
+package com.board.domain;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Date;
 
 
 @Getter
@@ -17,7 +14,7 @@ public class Board {
     private String title;
     private String content;
     private String name;
-    private Date saveDate;
-    private Date modifyDate;
+    private String saveDate;
+    private String modifyDate;
 
 }

@@ -1,7 +1,7 @@
-package com.board.reply.mapper;
+package com.board.service;
 
-import com.board.reply.domain.Reply;
-import com.board.reply.service.ReplyService;
+import com.board.domain.Reply;
+import com.board.mapper.ReplyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +15,13 @@ public class ReplyServiceImpl implements ReplyService {
     private final ReplyMapper replyMapper;
 
     @Override
-    public int saveReply(Reply reply) {
-        return replyMapper.saveReply(reply);
+    public List<Reply> getReplies(Long boardIdx) {
+        return replyMapper.getReplies(boardIdx);
     }
 
     @Override
-    public List<Reply> getMyReplies(Map<String, Object> myReplies) {
-        return replyMapper.getMyReplys(myReplies);
+    public int newReply(Reply reply) {
+        return replyMapper.newReply(reply);
     }
 
     @Override
@@ -29,9 +29,13 @@ public class ReplyServiceImpl implements ReplyService {
         return replyMapper.modifyReply(modifyReply);
     }
 
-    @Override
-    public int deleteReply(Long idx) {
+
+   /* public int deleteReply(Long idx) {
         return replyMapper.deleteReply(idx);
+    }*/
+    @Override
+    public int deleteReply(Map<String, Long> deleteReplyIdx) {
+        return replyMapper.deleteReply(deleteReplyIdx);
     }
 
     @Override

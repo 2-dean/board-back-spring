@@ -1,7 +1,7 @@
-package com.board.board.service;
+package com.board.service;
 
-import com.board.board.domain.Board;
-import com.board.board.mapper.BoardMapper;
+import com.board.domain.Board;
+import com.board.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,6 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public Object getBoardList() {
-        System.out.println("boardMapper.getBoardList() : " + boardMapper.getBoardList());
         List<Board> boardList = boardMapper.getBoardList();
         if(boardList.size() == 0 ){
             return "게시글없음";

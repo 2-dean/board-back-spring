@@ -1,7 +1,7 @@
 package com.board;
 
-import com.board.board.domain.Board;
-import com.board.board.service.BoardService;
+import com.board.domain.Board;
+import com.board.service.BoardService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

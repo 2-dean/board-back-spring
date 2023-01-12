@@ -1,6 +1,6 @@
-package com.board.board.service;
+package com.board.service;
 
-import com.board.board.domain.Board;
+import com.board.domain.Board;
 
 import java.util.List;
 import java.util.Map;

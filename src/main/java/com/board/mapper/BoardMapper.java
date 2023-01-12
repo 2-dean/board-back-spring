@@ -1,6 +1,6 @@
-package com.board.board.mapper;
+package com.board.mapper;
 
-import com.board.board.domain.Board;
+import com.board.domain.Board;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
