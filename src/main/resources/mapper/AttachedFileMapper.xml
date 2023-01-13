@@ -12,4 +12,8 @@
             #{savePath})
     </insert>
 
+    <select id="getFile" parameterType="Long" resultType="AttacheFile">
+        SELECT idx, ori_file_name, save_file_name, save_path, board_idx
+    </select>
+
 </mapper>

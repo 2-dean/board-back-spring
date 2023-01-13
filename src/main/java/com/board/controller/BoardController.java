@@ -5,6 +5,7 @@ import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
 import com.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,8 +48,12 @@ public class BoardController {
         return boardService.saveBoard(board);
     }
 
-    @RequestMapping("/download")
-    public int downLoadFile () {
+    @RequestMapping("/{idx}/download")
+    public int downLoadFile (@PathVariable("idx") Long idx) {
+        Board board = (Board)boardService.getBoardOne(idx);
+        Long fileIdx = board.getFileIdx();
+
+        new FileSystemResource();
         return 0;
     }
 
