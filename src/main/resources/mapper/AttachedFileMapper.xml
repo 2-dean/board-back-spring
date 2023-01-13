@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.mapper.AttachedFileMapper">
+
+    <!-- 파일 저장 -->
+    <insert id="saveFile" parameterType="AttachedFile" useGeneratedKeys="true" keyProperty="idx">
+        INSERT INTO file (ori_file_name, save_file_name, save_path)
+        VALUES (
+            #{oriFileName},
+            #{saveFileName},
+            #{savePath})
+    </insert>
+
+</mapper>

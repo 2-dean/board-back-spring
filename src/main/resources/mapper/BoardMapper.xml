@@ -3,24 +3,18 @@
 
 <mapper namespace="com.board.mapper.BoardMapper">
 
-    <insert id="saveFileBoard" parameterType="Board">
-        INSERT INTO board (title, content, name)
+    <insert id="saveBoard" parameterType="Board">
+        INSERT INTO board (title, content, name, file_idx)
         VALUES (
-                   #{title},
-                   #{content},
-                   #{name})
+               #{title},
+               #{content},
+               #{name},
+               #{fileIdx})
     </insert>
 
-    <insert id="saveBoard" parameterType="Board">
-        INSERT INTO board (title, content, name)
-        VALUES (
-                #{title},
-                #{content},
-                #{name})
-    </insert>
 
     <select id="getBoardList" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date
+        SELECT idx, title, content, name, save_date, modify_date, file_idx
         FROM board
         ORDER BY save_date DESC
     </select>

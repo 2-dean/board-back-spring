@@ -1,11 +1,14 @@
 package com.board.controller;
 
 import com.board.domain.Board;
+import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
-import com.board.service.ReplyService;
+import com.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +18,8 @@ import java.util.Map;
 public class BoardController {
 
     private final BoardService boardService;
-    private final ReplyService replyService;
+    private final AttachedFileService attachedFileService;
+    private final CommentService commentService;
 
     //게시글 전체 조회
     @GetMapping
@@ -26,19 +30,34 @@ public class BoardController {
 
     //게시글 작성
     @PostMapping("/new")
-    public int newBoard(@RequestBody Board board) {
+    public int newBoard(Board board) {
         int result = boardService.saveBoard(board);
         return result;
     }
 
+    //게시글 작성 + 파일
+    @PostMapping("/new-file")
+    public int newBoardFile(Board board, @RequestParam MultipartFile file) throws IOException {
 
+        if (!file.isEmpty()) {
+            Long fileIdx = attachedFileService.saveFile(file);
+            board.setFileIdx(fileIdx);
+        }
+        System.out.println("저장될 board : " + board);
+        return boardService.saveBoard(board);
+    }
+
+    @RequestMapping("/download")
+    public int downLoadFile () {
+        return 0;
+    }
 
     //게시글과 댓글 조회
     @GetMapping("/{idx}")
     public Object getBoardOne(@PathVariable("idx") Long idx ) {
         Map<String, Object> boardAndReply = new HashMap<>();
         boardAndReply.put("Board", boardService.getBoardOne(idx));
-        boardAndReply.put("Reply", replyService.getReplies((idx)));
+        boardAndReply.put("Reply", commentService.getComment((idx)));
 
         return boardAndReply;
     }

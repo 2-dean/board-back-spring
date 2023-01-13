@@ -7,7 +7,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class Reply {
+public class Comment {
 
     private Long idx;
     private Long boardIdx;

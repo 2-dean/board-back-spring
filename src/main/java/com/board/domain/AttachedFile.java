@@ -7,11 +7,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class File {
+public class AttachedFile {
 
     private Long idx;
-    String oriFileName;
-    String saveFileName;
-    String savePath;
+    private String oriFileName;
+    private String saveFileName;
+    private String savePath;
 
 }

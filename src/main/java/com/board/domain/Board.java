@@ -16,5 +16,7 @@ public class Board {
     private String name;
     private String saveDate;
     private String modifyDate;
+    private Long fileIdx;
+
 
 }

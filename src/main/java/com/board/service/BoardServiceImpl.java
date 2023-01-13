@@ -18,6 +18,7 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public int saveBoard(Board board) {
+        System.out.println("boardServiceImpl : " + board);
         return boardMapper.saveBoard(board);
     }
 
