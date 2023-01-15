@@ -7,5 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface AttachedFileMapper {
 
     Long saveFile(AttachedFile file);
+    AttachedFile downloadFile(Long fileIdx);
 
 }

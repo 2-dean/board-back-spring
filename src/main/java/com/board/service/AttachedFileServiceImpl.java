@@ -3,6 +3,8 @@ package com.board.service;
 import com.board.domain.AttachedFile;
 import com.board.mapper.AttachedFileMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +45,15 @@ public class AttachedFileServiceImpl implements AttachedFileService {
 
         return fileIdx;
 
+    }
+
+    @Override
+    public Resource downloadFile(Long idx) {
+        AttachedFile file = attachedFileMapper.downloadFile(idx);
+        String fileName = file.getSaveFileName();
+        String SAVEPATH = "/Users/ddu/Study/testboard/src/main/resources/static/fileRepository/";
+        Resource resource = new FileSystemResource(SAVEPATH + fileName);
+        return resource;
     }
 
 

@@ -5,7 +5,7 @@ import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
 import com.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,8 +32,7 @@ public class BoardController {
     //게시글 작성
     @PostMapping("/new")
     public int newBoard(Board board) {
-        int result = boardService.saveBoard(board);
-        return result;
+        return boardService.saveBoard(board);
     }
 
     //게시글 작성 + 파일
@@ -49,12 +48,10 @@ public class BoardController {
     }
 
     @RequestMapping("/{idx}/download")
-    public int downLoadFile (@PathVariable("idx") Long idx) {
+    public Resource downLoadFile (@PathVariable("idx") Long idx) {
         Board board = (Board)boardService.getBoardOne(idx);
         Long fileIdx = board.getFileIdx();
-
-        new FileSystemResource();
-        return 0;
+        return attachedFileService.downloadFile(fileIdx);
     }
 
     //게시글과 댓글 조회
