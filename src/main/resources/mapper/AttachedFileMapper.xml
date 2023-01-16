@@ -12,7 +12,7 @@
             #{savePath})
     </insert>
 
-    <select id="downloadFile" parameterType="Long" resultType="AttacheFile">
+    <select id="downloadFile" parameterType="Long" resultType="AttachedFile">
         SELECT idx, ori_file_name, save_file_name, save_path, board_idx
         FROM file
         WHERE idx = #{idx}

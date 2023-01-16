@@ -2,9 +2,12 @@ package com.board.service;
 
 import com.board.domain.Board;
 import com.board.mapper.BoardMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,9 +15,10 @@ import java.util.Optional;
 //비즈니스 로직 작성
 @Service
 @RequiredArgsConstructor
-public class BoardServiceImpl implements BoardService{
+public class BoardServiceImpl implements BoardService {
 
     private final BoardMapper boardMapper;
+
 
     @Override
     public int saveBoard(Board board) {
@@ -22,14 +26,11 @@ public class BoardServiceImpl implements BoardService{
         return boardMapper.saveBoard(board);
     }
 
+
     @Override
-    public Object getBoardList() {
-        List<Board> boardList = boardMapper.getBoardList();
-        if(boardList.size() == 0 ){
-            return "게시글없음";
-        } else {
-            return boardList;
-        }
+    public PageInfo<Board> getBoardList(int pageNo, int pageSize) {
+        PageHelper.startPage(pageNo, pageSize);
+        return PageInfo.of(boardMapper.getBoardList());
     }
 
     @Override

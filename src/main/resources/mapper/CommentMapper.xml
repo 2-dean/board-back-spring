@@ -6,14 +6,14 @@
     <!-- 게시글에 달린 댓글 -->
     <select id="getComment" parameterType="Long" resultType="Comment">
         SELECT idx, board_idx, name, content, save_date
-        FROM reply
+        FROM comment
         WHERE board_idx = #{boardIdx}
         ORDER BY save_date DESC
     </select>
 
     <!-- 댓글 작성 -->
     <insert id="newComment" parameterType="Comment">
-        INSERT INTO reply (board_idx, name, content)
+        INSERT INTO comment (board_idx, name, content)
         VALUES (
         #{boardIdx},
         #{name},
@@ -22,20 +22,20 @@
 
     <!-- 댓글 수정 -->
     <update id="modifyReply" parameterType="Map">
-        UPDATE reply
+        UPDATE comment
         SET name = #{name}, content =  #{content}
         WHERE idx = #{idx}
     </update>
 
     <!-- 댓글 삭제 -->
     <delete id="deleteReply" parameterType="Map">
-        DELETE FROM reply
+        DELETE FROM comment
         WHERE board_idx = #{boardIdx} AND idx = #{idx}
     </delete>
 
     <!-- 내 댓글 삭제 -->
     <delete id="deleteMyComment" parameterType="Map">
-        DELETE FROM reply
+        DELETE FROM comment
         WHERE board_idx = #{boardIdx} AND name = #{name}
     </delete>
 

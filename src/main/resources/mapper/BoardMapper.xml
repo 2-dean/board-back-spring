@@ -19,8 +19,17 @@
         ORDER BY save_date DESC
     </select>
 
+ <!--   <select id="getPageList" parameterType="Search" resultType="Board">
+        SELECT idx, title, content, name, save_date, modify_date, file_idx
+        FROM board
+        ORDER BY save_date DESC
+        LIMIT #{pagenation.limitStart}, #{recordSize}
+    </select>-->
+
+
+
     <select id="getBoardOne" parameterType="Long" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date
+        SELECT idx, title, content, name, save_date, modify_date, file_idx
         FROM board
         WHERE idx = #{idx}
     </select>

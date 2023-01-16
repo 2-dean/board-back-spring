@@ -1,7 +1,9 @@
 package com.board;
 
-import com.board.domain.Board;
 import com.board.domain.AttachedFile;
+import com.board.domain.Board;
+import com.board.mapper.AttachedFileMapper;
+import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
@@ -10,13 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 //@Transactional
 @SpringBootTest
@@ -36,7 +38,34 @@ class TestboardApplicationTests {
 
     @Autowired
     BoardService boardService;
+    @Autowired
+    AttachedFileService attachedFileService;
+    @Autowired
+    AttachedFileMapper attachedFileMapper;
 
+    @Test
+    void 다운로드 () {
+        Long idx = 44L;
+        Board board = (Board)boardService.getBoardOne(idx);
+        System.out.println("다운로드할 게시글 데이터" + board);
+        Long fileIdx = board.getFileIdx();
+        attachedFileService.downloadFile(fileIdx);
+    }
+
+    @Test
+    public ResponseEntity<Resource> downloadFile(Long idx) {
+        AttachedFile file = attachedFileMapper.downloadFile(idx);
+        String fileName = file.getSaveFileName();
+        System.out.println("다운로드 파일이름 : " + fileName);
+        String SAVEPATH = "/Users/ddu/Study/testboard/src/main/resources/static/download/";
+        Resource resource = new FileSystemResource(SAVEPATH + fileName);
+
+        System.out.println( "resource : " + resource);
+        if(!resource.exists()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+            return null;
+    }
 
     @Test
     void sava() {
