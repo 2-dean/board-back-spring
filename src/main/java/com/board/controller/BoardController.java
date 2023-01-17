@@ -12,11 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@RequestMapping("/boards")
+//@RequestMapping("/api/boards")
+//@RequestMapping("/boards")
 @RestController
 @RequiredArgsConstructor
 public class BoardController {
@@ -24,25 +26,34 @@ public class BoardController {
     private final BoardService boardService;
     private final AttachedFileService attachedFileService;
     private final CommentService commentService;
+
+    //페이지당 수량
     private final int pageSize = 5;
 
-    //게시글 전체 조회
-    @GetMapping
-    public ResponseEntity<PageInfo> selectCityList(@RequestParam(defaultValue = "1") Integer pageNum){
+    //게시글 전체 조회(페이지)
+    @GetMapping("/boards/{pageNum}")
+    public ResponseEntity<PageInfo> selectCityList(@PathVariable("pageNum") Integer pageNum){
         try{
-            //log.info("pageNum = {}, pageSize={}", pageNum, pageSize);
             PageInfo<Board> list = boardService.getBoardList(pageNum, pageSize);
-            //log.info("City List size = {}", list);
+            System.out.println(list);
             return ResponseEntity.ok(list);
         }catch (Exception e){
-            //log.info(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+    //게시글 1개 조회
+    @GetMapping("/board/{idx}/{pageNum}")
+    public Object getBoardOne(@PathVariable("idx") Long idx, @PathVariable("pageNum") Integer pageNum ) {
+        Map<String, Object> boardAndComment = new HashMap<>();
+        boardAndComment.put("Board", boardService.getBoardOne(idx));
+        boardAndComment.put("Comment", commentService.getComment(idx, pageNum, pageSize));
 
-    //게시글 작성
-    @PostMapping("/new")
+        return boardAndComment;
+    }
+
+    //게시글 작성 및 파일 업로드
+    @PostMapping("/board/new")
     public int newBoardFile(Board board, @RequestParam MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             Long fileIdx = attachedFileService.saveFile(file);
@@ -51,9 +62,11 @@ public class BoardController {
         return boardService.saveBoard(board);
     }
 
-    @GetMapping(value="/{idx}/download",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE )
-    public Object downLoadFile (@PathVariable("idx") Long idx) {
+    //파일다운로드
+    @GetMapping(value="/board/{idx}/download",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE )
+    public Object downLoadFile (@PathVariable("idx") Long idx) throws FileNotFoundException {
         Board board = (Board)boardService.getBoardOne(idx);
+
         if (board != null && board.getFileIdx() != null) {
             return attachedFileService.downloadFile(board.getFileIdx());
         } else {
@@ -62,36 +75,27 @@ public class BoardController {
 
     }
 
-    //게시글과 댓글 조회
-    @GetMapping("/{idx}")
-    public Object getBoardOne(@PathVariable("idx") Long idx ) {
-        Map<String, Object> boardAndReply = new HashMap<>();
-        boardAndReply.put("Board", boardService.getBoardOne(idx));
-        boardAndReply.put("Comment", commentService.getComment((idx)));
-
-        return boardAndReply;
-    }
 
     //검색 제목
-    @GetMapping("title/{title}")
+    @GetMapping("/boards/title/{title}")
     public Object findBoardByTitle(@PathVariable String title) {
         return boardService.findBoardByTitle(title);
     }
     //검색 작성자
-    @GetMapping("name/{name}")
+    @GetMapping("/boards/name/{name}")
     public Object findBoardByName(@PathVariable String name) {
           return boardService.findBoardByName(name);
     }
 
     //게시글 삭제
-    @DeleteMapping("/{idx}")
+    @DeleteMapping("/board/{idx}")
     public int deleteBoard(@PathVariable Long idx) {
         int result = boardService.deleteBoard(idx);
         return result;
     }
 
     //게시글 수정
-    @PatchMapping("/{idx}")
+    @PatchMapping("/board/{idx}")
     public int modifyBoard(@PathVariable("idx") Long idx, @RequestBody Map<String, Object>modifyBoard) {
          modifyBoard.put("idx", idx);
          return boardService.modifyBoard(modifyBoard);

@@ -5,38 +5,50 @@
 
     <!-- 게시글에 달린 댓글 -->
     <select id="getComment" parameterType="Long" resultType="Comment">
-        SELECT idx, board_idx, name, content, save_date
-        FROM comment
-        WHERE board_idx = #{boardIdx}
-        ORDER BY save_date DESC
+        SELECT c.idx,         # 댓글 Idx
+               c.board_idx,   # 게시판Idx
+               c.name,        # 댓글 작성자
+               c.content,     # 댓글 내용
+               c.save_date    # 작성일자
+        FROM comment c
+        WHERE c.board_idx = #{boardIdx}
+        ORDER BY c.save_date DESC
     </select>
 
     <!-- 댓글 작성 -->
     <insert id="newComment" parameterType="Comment">
-        INSERT INTO comment (board_idx, name, content)
+        INSERT INTO comment (
+                board_idx,    # 게시글번호
+                name,         # 작성자
+                content       # 댓글내용
+                )
         VALUES (
-        #{boardIdx},
-        #{name},
-        #{content})
+                #{boardIdx},
+                #{name},
+                #{content}
+                )
     </insert>
 
     <!-- 댓글 수정 -->
-    <update id="modifyReply" parameterType="Map">
+    <update id="modifyComment" parameterType="Map">
         UPDATE comment
-        SET name = #{name}, content =  #{content}
-        WHERE idx = #{idx}
+        SET name = #{name},
+            content =  #{content}
+        WHERE idx = #{idx}        # 댓글번호
     </update>
 
     <!-- 댓글 삭제 -->
-    <delete id="deleteReply" parameterType="Map">
+    <delete id="deleteComment" parameterType="Map">
         DELETE FROM comment
-        WHERE board_idx = #{boardIdx} AND idx = #{idx}
+        WHERE board_idx = #{boardIdx}
+        AND idx = #{idx}
     </delete>
 
     <!-- 내 댓글 삭제 -->
     <delete id="deleteMyComment" parameterType="Map">
         DELETE FROM comment
-        WHERE board_idx = #{boardIdx} AND name = #{name}
+        WHERE board_idx = #{boardIdx}
+        AND name = #{name}
     </delete>
 
 </mapper>

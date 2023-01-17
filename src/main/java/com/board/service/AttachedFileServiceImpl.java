@@ -4,16 +4,13 @@ import com.board.domain.AttachedFile;
 import com.board.mapper.AttachedFileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -24,6 +21,7 @@ public class AttachedFileServiceImpl implements AttachedFileService {
     private final AttachedFileMapper attachedFileMapper;
     private final String PATH = "/Users/ddu/Study/testboard/src/main/resources/static/fileRepository/";
 
+    //파일업로드
     @Override
     public Long saveFile(MultipartFile file) throws IOException {
 
@@ -52,26 +50,24 @@ public class AttachedFileServiceImpl implements AttachedFileService {
 
     }
 
+    //파일 다운로드
     @Override
-    public ResponseEntity<Resource> downloadFile(Long idx) {
+    public ResponseEntity<Resource> downloadFile(Long idx) throws FileNotFoundException {
         AttachedFile file = attachedFileMapper.downloadFile(idx);
         String fileName = file.getSaveFileName();
         System.out.println("다운로드 파일이름 : " + fileName);
 
-        Resource resource = new FileSystemResource(PATH+ fileName);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(PATH+ fileName));
         String resourceFilename= resource.getFilename();
         System.out.println("resource:  " + resource);
-        System.out.println("resource.getFilename: " + resource.getFilename());
+        System.out.println("resource.getFilename: " + resourceFilename);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        try {
-            httpHeaders.add("Content-Disposition", "attachment; filename=" +
-                    new String(resourceFilename.getBytes(StandardCharsets.UTF_8), "ISO-8859-1"));
-            httpHeaders.add("Content-Disposition", "attachment; filename=" + file.getOriFileName());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>(resource, httpHeaders, HttpStatus.OK);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .cacheControl(CacheControl.noCache())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .body(resource);
     }
 
 

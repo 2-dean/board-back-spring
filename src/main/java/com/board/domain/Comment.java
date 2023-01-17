@@ -9,10 +9,10 @@ import lombok.ToString;
 @ToString
 public class Comment {
 
-    private Long idx;
-    private Long boardIdx;
-    private String name;
-    private String content;
-    private String saveDate;
+    private Long idx;           //댓글번호
+    private Long boardIdx;      //댓글이 작성된 게시글번호
+    private String name;        //작성자
+    private String content;     //내용
+    private String saveDate;    //작성일자
 
 }

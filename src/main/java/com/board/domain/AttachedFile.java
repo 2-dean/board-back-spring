@@ -9,9 +9,9 @@ import lombok.ToString;
 @ToString
 public class AttachedFile {
 
-    private Long idx;
-    private String oriFileName;
-    private String saveFileName;
-    private String savePath;
+    private Long idx;           //파일번호
+    private String oriFileName; //첨부파일명
+    private String saveFileName;//시스템저장명
+    private String savePath;    //저장경로
 
 }

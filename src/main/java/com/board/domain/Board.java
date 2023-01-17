@@ -10,13 +10,13 @@ import lombok.ToString;
 @ToString
 public class Board {
 
-    private Long idx;
-    private String title;
-    private String content;
-    private String name;
-    private String saveDate;
-    private String modifyDate;
-    private Long fileIdx;
+    private Long idx;           //게시글번호
+    private String title;       //제목
+    private String content;     //내용
+    private String name;        //작성자
+    private String saveDate;    //작성일자
+    private String modifyDate;  //수정일자
+    private Long fileIdx;       //제목
 
 
 }

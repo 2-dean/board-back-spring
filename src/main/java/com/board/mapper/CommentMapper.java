@@ -15,10 +15,9 @@ public interface CommentMapper {
     int newComment(Comment Comment);
 
     //댓글 수정
-    int modifyComment(Map<String, Object> modifyComment);
+    int modifyComment(Comment modifyComent);
 
     //댓글 삭제
-//    int deleteComment(Long idx);
     int deleteComment(Map<String, Long> deleteCommentIdx);
 
     //댓글 삭제(내 댓글)

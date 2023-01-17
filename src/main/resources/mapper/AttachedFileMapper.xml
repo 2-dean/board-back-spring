@@ -5,16 +5,24 @@
 
     <!-- 파일 저장 -->
     <insert id="saveFile" parameterType="AttachedFile" useGeneratedKeys="true" keyProperty="idx">
-        INSERT INTO file (ori_file_name, save_file_name, save_path)
+        INSERT INTO file (
+            ori_file_name,    /*첨부파일명*/
+            save_file_name,   /*시스템저장명*/
+            save_path         /*#저장경로*/
+            )
         VALUES (
             #{oriFileName},
             #{saveFileName},
-            #{savePath})
+            #{savePath}
+            )
     </insert>
 
     <select id="downloadFile" parameterType="Long" resultType="AttachedFile">
-        SELECT idx, ori_file_name, save_file_name, save_path, board_idx
-        FROM file
+        SELECT f.idx,               # 파일번호
+               f.ori_file_name,     # 첨부파일명
+               f.save_file_name,    # 시스템저장명
+               f.save_path          # 저장경로
+        FROM file f
         WHERE idx = #{idx}
     </select>
 

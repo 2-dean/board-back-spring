@@ -2,10 +2,11 @@ package com.board.service;
 
 import com.board.domain.Comment;
 import com.board.mapper.CommentMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,8 +16,9 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
 
     @Override
-    public List<Comment> getComment(Long boardIdx) {
-        return commentMapper.getComment(boardIdx);
+    public PageInfo<Comment> getComment(Long boardIdx, int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+        return PageInfo.of(commentMapper.getComment(boardIdx));
     }
 
     @Override
@@ -25,8 +27,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public int modifyComment(Map<String, Object> modifyComment) {
-        return commentMapper.modifyComment(modifyComment);
+    public int modifyComment(Comment modifyComent) {
+        return commentMapper.modifyComment(modifyComent);
     }
 
     @Override

@@ -3,57 +3,82 @@
 
 <mapper namespace="com.board.mapper.BoardMapper">
 
+    <!-- 게시글 등록-->
     <insert id="saveBoard" parameterType="Board">
-        INSERT INTO board (title, content, name, file_idx)
+        INSERT INTO board (
+               title,
+               content,
+               name,
+               file_idx
+               )
         VALUES (
                #{title},
                #{content},
                #{name},
-               #{fileIdx})
+               #{fileIdx}
+               )
     </insert>
 
-
+    <!-- 게시글 목록-->
     <select id="getBoardList" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date, file_idx
-        FROM board
-        ORDER BY save_date DESC
+        SELECT b.idx,           # 게시글번호
+               b.title,         # 게시글제목
+               b.content,       # 게시글내용
+               b.name,          # 작성자
+               b.save_date,     # 작성일자
+               b.modify_date,   # 수정일자
+               b.file_idx       # 첨부파일번호
+        FROM board b
+        ORDER BY b.save_date DESC
     </select>
 
- <!--   <select id="getPageList" parameterType="Search" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date, file_idx
-        FROM board
-        ORDER BY save_date DESC
-        LIMIT #{pagenation.limitStart}, #{recordSize}
-    </select>-->
-
-
-
     <select id="getBoardOne" parameterType="Long" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date, file_idx
-        FROM board
-        WHERE idx = #{idx}
+        SELECT b.idx,
+               b.title,
+               b.content,
+               b.name,
+               b.save_date,
+               b.modify_date,
+               b.file_idx
+        FROM board b
+        WHERE b.idx = #{idx}
     </select>
 
 
     <!-- 검색 -->
     <select id="findBoardByTitle" parameterType="String" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date
-        FROM board
-        WHERE title LIKE  CONCAT ('%',#{title},'%')
-        ORDER BY save_date DESC
+        SELECT b.idx,
+               b.title,
+               b.content,
+               b.name,
+               b.save_date,
+               b.modify_date
+        FROM board b
+        WHERE b.title
+        LIKE  CONCAT ('%',#{title},'%')
+        ORDER BY b.save_date DESC
     </select>
 
     <select id="findBoardByName" parameterType="String" resultType="Board">
-        SELECT idx, title, content, name, save_date, modify_date
-        FROM board
-        WHERE name LIKE CONCAT ('%', #{name}, '%')
-        ORDER BY save_date DESC
+        SELECT b.idx,
+               b.title,
+               b.content,
+               b.name,
+               b.save_date,
+               b.modify_date
+        FROM board b
+        WHERE b.name
+        LIKE CONCAT ('%', #{name}, '%')
+        ORDER BY b.save_date DESC
     </select>
 
     <update id="modifyBoard" parameterType="Map">
         UPDATE board
-        SET title = #{title}, content =  #{content}, modify_date = current_timestamp()
-        WHERE idx = #{idx}
+        SET title = #{title},
+            content =  #{content},
+            modify_date = current_timestamp()
+        WHERE 1=1
+        AND b.idx = #{idx}
     </update>
 
     <delete id="deleteBoard" parameterType="Long">

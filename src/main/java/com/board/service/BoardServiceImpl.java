@@ -7,7 +7,6 @@ import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +21,6 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public int saveBoard(Board board) {
-        System.out.println("boardServiceImpl : " + board);
         return boardMapper.saveBoard(board);
     }
 

@@ -9,15 +9,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/boards/{boardIdx}/comment")
+@RequestMapping("/board/{boardIdx}/comment")
 @RequiredArgsConstructor
 public class CommentController{
+    //게시글에 달린 댓글은 BoardController 에서 구현
 
     private final CommentService commentService;
 
-    //게시글에 달린 댓글은 BoardController 에서 구현
-
-    // 댓글 작성
+    //댓글 작성
     @PostMapping("/new")
     public int newComment(@PathVariable Long boardIdx, @RequestBody Comment comment) {
         comment.setBoardIdx(boardIdx);
@@ -26,13 +25,9 @@ public class CommentController{
 
     //댓글 수정
     @PostMapping("/{idx}")
-    int modify(@PathVariable Long boardIdx, @PathVariable Long idx,
-                    @RequestBody Map<String, Object> modify) {
-
-        modify.put("boardIdx", boardIdx);
-        modify.put("idx", idx);
-
-        return commentService.modifyComment(modify);
+    int modify(@PathVariable Long idx, @RequestBody Comment comment) {
+        comment.setIdx(idx);
+        return commentService.modifyComment(comment);
     }
 
     //댓글 삭제
