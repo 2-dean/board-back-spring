@@ -5,6 +5,7 @@ import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
 import com.board.service.CommentService;
 import com.github.pagehelper.PageInfo;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ public class BoardController {
     private final int pageSize = 5;
 
     //게시글 전체 조회(페이지)
+    @Operation(summary = "조회", description = "게시글 전체 조회 api pageNum입력")
     @GetMapping("/boards/{pageNum}")
     public ResponseEntity<PageInfo> selectCityList(@PathVariable("pageNum") Integer pageNum){
         try{
