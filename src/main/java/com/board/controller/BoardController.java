@@ -6,6 +6,7 @@ import com.board.service.BoardService;
 import com.board.service.CommentService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 //@RequestMapping("/api/boards")
 //@RequestMapping("/boards")
+@Tag(name = "Board", description = "게시판 api")
 @RestController
 @RequiredArgsConstructor
 public class BoardController {
@@ -32,7 +34,7 @@ public class BoardController {
     private final int pageSize = 5;
 
     //게시글 전체 조회(페이지)
-    @Operation(summary = "조회", description = "게시글 전체 조회 api pageNum입력")
+    @Operation(summary = "게시판 전체 목록 조회", description = "pageNum 입력")
     @GetMapping("/boards/{pageNum}")
     public ResponseEntity<PageInfo> selectCityList(@PathVariable("pageNum") Integer pageNum){
         try{
@@ -45,6 +47,7 @@ public class BoardController {
     }
 
     //게시글 1개 조회
+    @Operation(summary = "게시글 1개와 댓글 조회", description = "게시글 번호와 댓글 페이지 입력")
     @GetMapping("/board/{idx}/{pageNum}")
     public Object getBoardOne(@PathVariable("idx") Long idx, @PathVariable("pageNum") Integer pageNum ) {
         Map<String, Object> boardAndComment = new HashMap<>();
@@ -55,7 +58,8 @@ public class BoardController {
     }
 
     //게시글 작성 및 파일 업로드
-    @PostMapping("/board/new")
+    @Operation(summary = "게시글 작성 및 파일 업로드")
+    @PostMapping(value = "/board/new", consumes = {"multipart/form-data"})
     public int newBoardFile(Board board, @RequestParam MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             Long fileIdx = attachedFileService.saveFile(file);
@@ -65,6 +69,7 @@ public class BoardController {
     }
 
     //파일다운로드
+    @Operation(summary = "게시글의 파일 다운로드", description = "게시글 번호를 입력하면 파일이 다운로드 됩니다")
     @GetMapping(value="/board/{idx}/download",  produces = MediaType.APPLICATION_OCTET_STREAM_VALUE )
     public Object downLoadFile (@PathVariable("idx") Long idx) throws FileNotFoundException {
         Board board = (Board)boardService.getBoardOne(idx);
@@ -79,17 +84,21 @@ public class BoardController {
 
 
     //검색 제목
+    @Operation(summary = "제목으로 검색")
     @GetMapping("/boards/title/{title}")
     public Object findBoardByTitle(@PathVariable String title) {
         return boardService.findBoardByTitle(title);
     }
+
     //검색 작성자
+    @Operation(summary = "작성자로 검색")
     @GetMapping("/boards/name/{name}")
     public Object findBoardByName(@PathVariable String name) {
           return boardService.findBoardByName(name);
     }
 
     //게시글 삭제
+    @Operation(summary = "게시글 삭제", description = "게시글 번호 입력시 데이터 삭제")
     @DeleteMapping("/board/{idx}")
     public int deleteBoard(@PathVariable Long idx) {
         int result = boardService.deleteBoard(idx);
@@ -97,6 +106,7 @@ public class BoardController {
     }
 
     //게시글 수정
+    @Operation(summary = "게시글 수정", description = "수정 데이터를 입력하면 수정됩니다")
     @PatchMapping("/board/{idx}")
     public int modifyBoard(@PathVariable("idx") Long idx, @RequestBody Map<String, Object>modifyBoard) {
          modifyBoard.put("idx", idx);
