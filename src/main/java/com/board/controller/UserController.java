@@ -1,23 +1,17 @@
 package com.board.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
+@RequestMapping("api/vi/users")
 public class UserController {
-    @GetMapping("/login")
-    public String login (){
-        return "redirect:/login";
-    }
+
 
     @PostMapping("/login")
-    public String login (@RequestBody String username, @RequestBody String password){
-        if (username.equals("username") && password.equals("password")) {
-        }
-        return "redirect:/hello";
+    public ResponseEntity<String> login () {
+        return ResponseEntity.ok().body("token");
     }
 
-    //http://localhost:8080/login
 }
