@@ -27,3 +27,13 @@ CREATE TABLE `comment` (
                            `save_date` datetime DEFAULT current_timestamp() COMMENT '작성시간',
                            PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `user` (
+                        `idx` bigint(20) NOT NULL AUTO_INCREMENT,
+                        `id` varchar(100) NOT NULL,
+                        `password` varchar(100) NOT NULL,
+                        `name` varchar(50) DEFAULT NULL,
+                        `state` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;

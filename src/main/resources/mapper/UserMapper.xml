@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.mapper.UserMapper">
+
+<!-- 회원 찾기 -->
+    <select id="findUser" parameterType="User" resultType="User">
+        SELECT idx,
+                id,
+                password,
+                name,
+                state
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+<!-- 회원가입 -->
+    <insert id="save" parameterType="">
+        INSERT INTO comment (
+                board_idx,    # 게시글번호
+                name,         # 작성자
+                content       # 댓글내용
+                )
+        VALUES (
+                #{boardIdx},
+                #{name},
+                #{content}
+                )
+    </insert>
+
+<!-- 회원정보 수정 -->
+    <update id="modify" parameterType="">
+        UPDATE comment
+        SET name = #{name},
+            content =  #{content}
+        WHERE idx = #{idx}        # 댓글번호
+    </update>
+
+</mapper>

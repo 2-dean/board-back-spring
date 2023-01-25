@@ -1,7 +1,8 @@
-package com.board.service;
+package com.board.service.impl;
 
 import com.board.domain.Comment;
 import com.board.mapper.CommentMapper;
+import com.board.service.CommentService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;

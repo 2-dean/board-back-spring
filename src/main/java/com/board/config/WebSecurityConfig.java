@@ -10,13 +10,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-/*@Configuration
-@EnableWebSecurity*/
-public class WebSecurityConfig {
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig { //SpringSecurity 환경설정 구성 클래스
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // 권한에 따라 허용하는 url 설정
+    //HTTP 인증, 인가 담당, 필터를 통해 인증방식과 인증절차에 대해 등록하며 설정을 담당
 
         // /, /home 페이지는 모두 허용(인증 필요없음), 다른 페이지는 인증된 사용자만 허용
         http

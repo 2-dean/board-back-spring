@@ -1,7 +1,8 @@
-package com.board.service;
+package com.board.service.impl;
 
 import com.board.domain.Board;
 import com.board.mapper.BoardMapper;
+import com.board.service.BoardService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;

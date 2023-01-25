@@ -3,7 +3,7 @@
 
 <mapper namespace="com.board.mapper.CommentMapper">
 
-    <!-- 게시글에 달린 댓글 -->
+<!-- 게시글에 달린 댓글 -->
     <select id="getComment" parameterType="Long" resultType="Comment">
         SELECT c.idx,         # 댓글 Idx
                c.board_idx,   # 게시판Idx

@@ -1,7 +1,8 @@
-package com.board.service;
+package com.board.service.impl;
 
 import com.board.domain.AttachedFile;
 import com.board.mapper.AttachedFileMapper;
+import com.board.service.AttachedFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
