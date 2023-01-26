@@ -1,10 +1,7 @@
 package com.board.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,6 +11,8 @@ import java.util.Collection;
 @Setter
 @ToString
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements UserDetails {
                     //spring security를 이용하기 위한 객체로 사용(userDTO, userDetailsDTO로 따로 만들어야할지?)
 
@@ -21,12 +20,12 @@ public class User implements UserDetails {
     private Long idx;
     @Schema(description = "아이디", nullable = false)
     private String id;
-    @Schema(description = "비밀번호", nullable = false, hidden = true)
+    @Schema(description = "비밀번호", nullable = false)
     private String password;
-    @Schema(description = "이름", nullable = false, hidden = true)
+    @Schema(description = "이름", nullable = false)
     private String name;
-    @Schema(description = "상태", nullable = false, hidden = true)
-    private String state;
+    @Schema(description = "역할", nullable = false)
+    private Long role;
 
 
     @Override

@@ -44,14 +44,12 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Optional<List<Board>> findBoardByTitle(String title) {
-        Optional<List<Board>> result = Optional.ofNullable(boardMapper.findBoardByTitle(title));
-        return result;
+        return Optional.ofNullable(boardMapper.findBoardByTitle(title));
     }
 
     @Override
     public Optional<List<Board>> findBoardByName(String name) {
-        Optional<List<Board>> result = Optional.ofNullable(boardMapper.findBoardByName(name));
-        return result;
+        return Optional.ofNullable(boardMapper.findBoardByName(name));
     }
 
     @Override
