@@ -3,9 +3,12 @@ package com.board.domain;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,10 +30,16 @@ public class User implements UserDetails {
     @Schema(description = "역할", nullable = false)
     private Role role;
 
+    public User(User user) {
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        Set<GrantedAuthority> roles = new HashSet<>();
+        roles.add(new SimpleGrantedAuthority(role.getValue()));
+        System.out.println("roles: " + roles.toString());
+        return roles;
     }
 
     @Override

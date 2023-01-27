@@ -23,8 +23,13 @@ public class WebSecurityConfig {
                     .antMatchers("/boards/**").access("hasRole(ROLE_USER)") // boards/** 요청은 인증필요
                     .and()
                     .formLogin()
-                    .loginPage("/login")
+                    //.loginPage("/login")
                     .loginProcessingUrl("/users/login") // 이 url로 들어오면 userDetailServiceImpl 의 loadUserByUsername 메소드 실행됨
+                    .and()
+                    .logout()
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true) //세션 날리기
                     .and()
                     .build();
     }

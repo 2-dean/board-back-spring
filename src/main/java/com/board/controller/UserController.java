@@ -30,7 +30,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public ResponseEntity<String> login (@RequestBody User user, HttpServletRequest request) {
         System.out.println("/Login 요청들어옴 user : " + user);
         resultMessage = userService.login(user);

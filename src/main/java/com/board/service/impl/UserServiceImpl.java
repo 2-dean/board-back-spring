@@ -17,18 +17,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService, UserDetailsService {
-                                                     //spring security 에서 유저의 정보를 가져오는 인터페이스
+public class UserServiceImpl implements UserService {
+
     @Autowired
     private final UserMapper userMapper;
+    @Autowired
     private final BCryptPasswordEncoder encoder;
 
-    @Override
-    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        return Optional
-                .ofNullable(userMapper.findUser(id))
-                .orElseThrow(()-> new BadCredentialsException("아이디를 확인해주세요.")).get();
-    }
 
     @Override
     public String join(User joinUser) {

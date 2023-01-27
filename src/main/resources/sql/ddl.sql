@@ -29,11 +29,13 @@ CREATE TABLE `comment` (
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4;
 
 
+-- sjlim.`user` definition
+
 CREATE TABLE `user` (
                         `idx` bigint(20) NOT NULL AUTO_INCREMENT,
                         `id` varchar(100) NOT NULL,
                         `password` varchar(100) NOT NULL,
                         `name` varchar(50) DEFAULT NULL,
-                        `state` varchar(50) DEFAULT NULL,
+                        `role` varchar(50) DEFAULT NULL,
                         PRIMARY KEY (`idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
