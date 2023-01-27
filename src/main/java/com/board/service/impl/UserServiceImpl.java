@@ -1,10 +1,15 @@
 package com.board.service.impl;
 
+import com.board.domain.Role;
 import com.board.domain.User;
 import com.board.mapper.UserMapper;
 import com.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +17,18 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
-
+public class UserServiceImpl implements UserService, UserDetailsService {
+                                                     //spring security 에서 유저의 정보를 가져오는 인터페이스
     @Autowired
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder encoder;
 
+    @Override
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        return Optional
+                .ofNullable(userMapper.findUser(id))
+                .orElseThrow(()-> new BadCredentialsException("아이디를 확인해주세요.")).get();
+    }
 
     @Override
     public String join(User joinUser) {
@@ -26,12 +37,12 @@ public class UserServiceImpl implements UserService {
             return joinUser.getId() + " 는 이미 존재함";
         }
         System.out.println("joinUser : " + joinUser);
-        // password 인코딩 후 저장
+        // password 인코딩, "USER"관한 부여
         User user = User.builder()
                         .id(joinUser.getId())
                         .password(encoder.encode(joinUser.getPassword()))
                         .name(joinUser.getName())
-                        .role(2L)
+                        .role(Role.ROLE_USER)
                         .build();
         userMapper.save(user);
         return "회원 가입 성공";
@@ -41,12 +52,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public String login(User user) {
         //인증
-
         // id 없음
         if (!userMapper.findUser(user.getId()).isPresent()){
             return "등록되지 않은 사용자";
         }
         User selectUser = userMapper.findUser(user.getId()).get();
+
         // password 틀림
         if (!encoder.matches(user.getPassword(), selectUser.getPassword())){
                     //입력받은 Password를 인코딩해서 저장소의 인코딩된 비밀번호와 비교
@@ -54,6 +65,9 @@ public class UserServiceImpl implements UserService {
         }
 
         // 이상없으면 로그인
-        return "로그인";
+        return "로그인 성공";
     }
+
+
+
 }

@@ -14,7 +14,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
-                    //spring security를 이용하기 위한 객체로 사용(userDTO, userDetailsDTO로 따로 만들어야할지?)
+                    //spring security 에서 사용자의 정보를 담는 인터페이스. spring security 에서 사용자 정보를 불러오기 위해 구현해야하는 인터페이스
 
     @Schema(description = "사용자 번호(PK)", nullable = false, hidden = true)
     private Long idx;
@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Schema(description = "이름", nullable = false)
     private String name;
     @Schema(description = "역할", nullable = false)
-    private Long role;
+    private Role role;
 
 
     @Override
@@ -35,31 +35,31 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return this.password;
     }
 
     @Override
-    public String getUsername() {
-        return null;
+    public String getUsername() { //username = 계정의 고유한 값
+        return this.id;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

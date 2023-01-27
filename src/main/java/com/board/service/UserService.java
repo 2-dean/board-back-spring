@@ -1,8 +1,7 @@
 package com.board.service;
 
 import com.board.domain.User;
-
-import java.util.Optional;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService {
     //회원가입
