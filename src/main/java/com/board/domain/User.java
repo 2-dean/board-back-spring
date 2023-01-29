@@ -33,12 +33,11 @@ public class User implements UserDetails {
     public User(User user) {
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> roles = new HashSet<>();
         roles.add(new SimpleGrantedAuthority(role.getValue()));
-        System.out.println("roles: " + roles.toString());
+        System.out.println(">> Uesr.java >> roles: " + roles.toString());
         return roles;
     }
 

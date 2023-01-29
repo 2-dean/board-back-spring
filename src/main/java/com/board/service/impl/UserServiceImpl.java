@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
             return joinUser.getId() + " 는 이미 존재함";
         }
         System.out.println("joinUser : " + joinUser);
+
         // password 인코딩, "USER"관한 부여
         User user = User.builder()
                         .id(joinUser.getId())

@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailServiceImpl implements UserDetailsService { //spring security 에서 유저의 정보를 가져오는 인터페이스
@@ -18,9 +20,16 @@ public class UserDetailServiceImpl implements UserDetailsService { //spring secu
 
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        System.out.println("loadUserByUsername() 실행");
-        User user = userMapper.findUser(id).get();
-        return user;
+        System.out.println(">> loadUserByUsername() 실행");
+        
+        Optional<User> user = userMapper.findUser(id);
+        
+        if(user.isPresent()){
+            System.out.println("user = " + user);
+            return user.get();
+            
+        }
+        return null;
     }
 
 

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,10 +30,15 @@ public class UserController {
         return ResponseEntity.ok().body(resultMessage);
     }
 
-
-//    @PostMapping("/login")
+    @RequestMapping("/")
+    public void successLogin () {
+        System.out.println(">> 로그인 성공");
+    }
+    @PostMapping("/login")
     public ResponseEntity<String> login (@RequestBody User user, HttpServletRequest request) {
         System.out.println("/Login 요청들어옴 user : " + user);
+        HttpSession session = request.getSession();
+        System.out.println("session : " + session);
         resultMessage = userService.login(user);
         return ResponseEntity.ok().body(resultMessage);
     }
