@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,13 +35,19 @@ public class UserController {
     public void successLogin () {
         System.out.println(">> 로그인 성공");
     }
+
+
     @PostMapping("/login")
     public ResponseEntity<String> login (@RequestBody User user, HttpServletRequest request) {
         System.out.println("/Login 요청들어옴 user : " + user);
         HttpSession session = request.getSession();
         System.out.println("session : " + session);
-        resultMessage = userService.login(user);
-        return ResponseEntity.ok().body(resultMessage);
+        Map<String,String> result = userService.login(user);
+        String access = result.get("accessToken");
+        String refresh = result.get("refreshToken");
+        ResponseEntity.ok().header("jwt-access", access);
+        ResponseEntity.ok().header("jwt-refresh", refresh);
+        return ResponseEntity.ok().body("로그인 성공");
     }
 
 }
