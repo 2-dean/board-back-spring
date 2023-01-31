@@ -1,6 +1,7 @@
 package com.board.mapper;
 
 import com.board.domain.User;
+import io.jsonwebtoken.Claims;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Optional;
@@ -11,7 +12,9 @@ public interface UserMapper {
     Optional<User> findUser(String id);
     //회원 등록
     int save(User user);
-    //회원 탈퇴 (수정)
-    //int leave(String id);
+    //토큰 등록
+    void setJwt(String token);
+
+
 
 }

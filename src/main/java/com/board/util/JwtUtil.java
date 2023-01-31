@@ -3,54 +3,51 @@ package com.board.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
-public class JwtUtil{ // JWT 생성
+@RequiredArgsConstructor
+public class JwtUtil{ // JWT 생성, 디코딩
 
-
-    // token 에서 id 꺼내기
-    public static String getUserId(String token, String secretKey) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-                .getBody().get("id", String.class);
-    }
-
-    // token 만료 확인
-    public static boolean isExpired(String token, String secretKey) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-                .getBody().getExpiration().before(new Date());
-    }
-
-
-    // 토큰생성
-    public static Map<String, String> createJwt(String id, String secretKey, long expiredTime){
+    // 토큰 만들기
+    public static String createAuthJwtToken(Authentication authentication) {
         Claims claims = Jwts.claims();
-        claims.put("id", id);
+        claims.put("id", authentication.getName());
+
         Date now = new Date(System.currentTimeMillis());
 
-        //Access token
         String accessToken = Jwts.builder()
-                                .setClaims(claims)
-                                .setIssuedAt(now)                                       // 만든날짜
-                                .setExpiration(new Date(now.getTime() + expiredTime))   // 만료일자
-                                .signWith(SignatureAlgorithm.HS256, secretKey)          // HS256 알고리즘 이용해서 서명됨
-                                .compact();
-
-        //refresh 토큰생성
-        String refreshToken = Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(now)                                                   // 만든날짜
-                .setExpiration(new Date(now.getTime() + expiredTime * 24 * 5 ))     // 만료일자
-                .signWith(SignatureAlgorithm.HS256, secretKey)                      // HS256 알고리즘 이용해서 서명됨
+                .setIssuedAt(now)  // 만든날짜
+                .setExpiration(new Date(now.getTime() + JwtProperties.EXPIRATION_TIME))   // 만료일자
+                .signWith(SignatureAlgorithm.HS256, JwtProperties.SECRET_KEY)             // HS256 알고리즘 이용해서 서명됨
                 .compact();
-        
-        Map<String, String> token = new HashMap<>();
-        token.put("accessToken", accessToken);
-        token.put("refreshToken", refreshToken);
+        return accessToken;
+    }
 
-        return token;
+  /*  // token을 받아서 claim 만들고 > user 객체 생성해서 Authentication 객체 반환하기
+    public Authentication getAuthentication(String token) {
+
+        String id = Jwts.parser()
+                        .setSigningKey(JwtProperties.SECRET_KEY)
+                        .parseClaimsJws(token)
+                        .getBody().get("id", String.class);
+
+        UserDetails userDetails = UserDeta
+
+        return new UsernamePasswordAuthenticationToken()
+
+    }*/
+
+    // token 만료 확인
+    public static boolean isExpired(String token) {
+        return Jwts.parser().setSigningKey(JwtProperties.SECRET_KEY).parseClaimsJws(token)
+                .getBody().getExpiration().before(new Date());
     }
 
 

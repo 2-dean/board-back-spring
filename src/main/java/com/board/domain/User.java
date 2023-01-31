@@ -17,7 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements UserDetails {
-                    //spring security 에서 사용자의 정보를 담는 인터페이스. spring security 에서 사용자 정보를 불러오기 위해 구현해야하는 인터페이스
+    //spring security 에서 사용자의 정보를 담는 인터페이스. spring security 에서 사용자 정보를 불러오기 위해 구현해야하는 인터페이스
+    // implements UserDetails 해서 Principal 형태의 객체를 만들 수 있음
 
     @Schema(description = "사용자 번호(PK)", nullable = false, hidden = true)
     private Long idx;
@@ -29,8 +30,21 @@ public class User implements UserDetails {
     private String name;
     @Schema(description = "역할", nullable = false)
     private Role role;
+    @Schema(description = "accessToken")
+    private String accessToken;
+    @Schema(description = "refreshToken")
+    private String refreshToken;
 
-    public User(User user) {
+
+
+    @Override
+    public String getUsername() { //username = 계정의 고유한 값
+        return this.id;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
     }
 
     @Override
@@ -41,15 +55,6 @@ public class User implements UserDetails {
         return roles;
     }
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public String getUsername() { //username = 계정의 고유한 값
-        return this.id;
-    }
 
     @Override
     public boolean isAccountNonExpired() {

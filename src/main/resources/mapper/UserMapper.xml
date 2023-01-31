@@ -30,12 +30,12 @@
                 )
     </insert>
 
-
-<!--    <update id="modify" parameterType="">
-        UPDATE comment
-        SET name = #{name},
-            content =  #{content}
-        WHERE idx = #{idx}        # 댓글번호
+<!-- jwt 최초 발급 -->
+    <update id="setJwt" parameterType="User">
+        UPDATE user
+        SET access_token = #{accessToken},
+            refresh_token = #{refreshToken}
+        WHERE id = #{id}
     </update>
-   -->
+
 </mapper>
