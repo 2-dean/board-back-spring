@@ -10,8 +10,8 @@
                password,
                name,
                role
-        FROM user
-        WHERE id = #{id}
+        FROM    user
+        WHERE   id = #{id}
     </select>
 
 <!-- 회원가입 -->

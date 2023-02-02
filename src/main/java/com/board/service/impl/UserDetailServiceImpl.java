@@ -1,5 +1,6 @@
 package com.board.service.impl;
 
+import com.board.config.EncoderConfig;
 import com.board.domain.User;
 import com.board.exception.AppException;
 import com.board.exception.ErrorCode;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -25,9 +27,15 @@ public class UserDetailServiceImpl implements UserDetailsService {
         //지정된 repository에서 인증 대상 객체를 찾아서 Principal 형태로 반환
 
         System.out.println(">> loadUserByUsername() 실행");
+        System.out.println("id  : " + id);
 
         User user = userMapper.findUser(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND, id + " 는 없는 아이디입니다."));
+                                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND, id + " 는 없는 아이디입니다."));
+        System.out.println("user" + user.toString());
+
         return user;
     }
+
+
+
 }

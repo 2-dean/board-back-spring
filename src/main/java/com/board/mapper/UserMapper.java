@@ -1,7 +1,6 @@
 package com.board.mapper;
 
 import com.board.domain.User;
-import io.jsonwebtoken.Claims;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Optional;

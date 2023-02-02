@@ -35,14 +35,14 @@ public class UserController {
     }
 
 
-   @PostMapping("/login")
+/*   @PostMapping("/login")
     public ResponseEntity<String> login (@RequestBody User user, HttpServletRequest request) {
         System.out.println("/Login 요청들어옴 user : " + user);
 
         userDetailsService.loadUserByUsername(user.getId());
 
         return ResponseEntity.ok().body("로그인 요청함 ");
-    }
+    }*/
 
     @RequestMapping("/logout")
     public void logout () {
