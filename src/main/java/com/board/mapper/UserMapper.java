@@ -11,9 +11,4 @@ public interface UserMapper {
     Optional<User> findUser(String id);
     //회원 등록
     int save(User user);
-    //토큰 등록
-    void setJwt(String token);
-
-
-
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     //UserDetailsService : spring security 에서 유저의 정보를 가져오는 인터페이스
 
-
     @Autowired
     private final UserMapper userMapper;
     @Autowired
@@ -44,35 +43,6 @@ public class UserServiceImpl implements UserService {
     public User findUser(String id) {
         return userMapper.findUser(id).get();
     }
-
-/*
-    @Override
-    public ResponseEntity<String> login(User user) {
-        // 인증
-
-        // id 없음
-        if (!userMapper.findUser(user.getId()).isPresent()) {
-            return ResponseEntity.ok("등록되지 않은 사용자");
-        }
-
-        User selectUser = userMapper.findUser(user.getId()).get();
-
-        // password 틀림
-        if (!encoder.matches(user.getPassword(), selectUser.getPassword())){
-                    //입력받은 Password를 인코딩해서 저장소의 인코딩된 비밀번호와 비교
-            return ResponseEntity.ok("비밀번호 일치하지 않음");
-        }
-
-        // 이상없으면 토큰 발행
-        String jwt = JwtUtil.createAuthJwtToken(user.getId(), secretkey, expireTime);
-
-
-        // db에 토큰저장
-        userMapper.setJwt(jwt);
-        return ResponseEntity.ok("token : {}" + jwt);
-
-    }
-*/
 
 
 

@@ -45,6 +45,10 @@ dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
+	//Log4Jdbv
+	implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
+
+
 	//log4j 2
 	implementation "org.springframework.boot:spring-boot-starter-log4j2"
 	modules {

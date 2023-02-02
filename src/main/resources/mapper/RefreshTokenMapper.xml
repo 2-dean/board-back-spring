@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.mapper.RefreshTokenMapper">
+
+<!-- jwt 최초 발급 -->
+    <insert id="saveRefreshToken" parameterType="User">
+        INSERT INTO refresh_token (
+                user_id,        #사용자ID
+                refresh_token   #refreshToken
+               )
+        VALUES (
+                #{id},
+                #{refreshToken}
+                )
+    </insert>
+
+</mapper>
