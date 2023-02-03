@@ -1,7 +1,7 @@
 package com.board.security;
 
 import com.board.domain.User;
-import com.board.mapper.RefreshTokenMapper;
+import com.board.service.impl.RedisService;
 import com.board.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     //JwtAuthenticationFilter
 
     private final CustomAuthProvider customAuthProvider; //스프링 시큐리티 인증 수행방식 정의 API
-    private final RefreshTokenMapper refreshTokenMapper;
+    private final RedisService redisService;
     private final JwtUtil jwtUtil;
+
+
 
 
     @Override
@@ -48,8 +50,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 new UsernamePasswordAuthenticationToken(user.getId(), user.getPassword());
         System.out.println("authenticationToken 객체 : " + authenticationToken.toString());
 
-        // 스프링 시큐리티 filter 사용시 AuthenticationManager를 이용해 SecurityContextHolder에 저장함
-        // AuthenticationManager의 구현체인 ProviderManager에게 생성한 UsernamePasswordToken 객체를 전달해서 인증한다(SecurityContextHolder 에 저장)
+        // 스프링 시큐리티 filter 사용시 AuthenticationManager 를 이용해 SecurityContextHolder 에 저장함
+        // AuthenticationManager의 구현체인 ProviderManager 에게 생성한 UsernamePasswordToken 객체를 전달해서 인증한다(SecurityContextHolder 에 저장)
         Authentication authenticate = customAuthProvider.authenticate(authenticationToken);
         System.out.println("authenticate  : " + authenticate.toString());
 
@@ -65,15 +67,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         User user = (User) authResult.getPrincipal();
 
-        String accessToken = JwtUtil.createAuthJwtToken(user.getId());
-        String refreshToken = JwtUtil.createRefreshToken();
+        String accessToken = jwtUtil.createAuthToken(user.getId());
+        String refreshToken = jwtUtil.createRefreshToken();
         System.out.println("accessToken 생성 : " + accessToken);
         System.out.println("refreshToken 생성 : " + refreshToken);
 
         //db에 refresh token 저장
         user.setRefreshToken(refreshToken);
         System.out.println("user: " + user);
-        refreshTokenMapper.saveRefreshToken(user);
+        //RefreshToken refreshToken1 = new RefreshToken(refreshToken, user.getId());
+        redisService.setValues(user.getId(),refreshToken);
         System.out.println("refreshToken 저장 완료  ");
 
         // 쿠키에 저장

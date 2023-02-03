@@ -45,11 +45,14 @@ dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	//Log4Jdbv
+	//Log4Jdbc
 	implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
 
+	//Redis - refreshToken 저장용
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	//log4j 2
+
+	//log4j
 	implementation "org.springframework.boot:spring-boot-starter-log4j2"
 	modules {
 		module("org.springframework.boot:spring-boot-starter-logging") {

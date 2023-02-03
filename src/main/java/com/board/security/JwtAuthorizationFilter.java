@@ -1,8 +1,8 @@
 package com.board.security;
 
 import com.board.domain.User;
-import com.board.mapper.RefreshTokenMapper;
 import com.board.mapper.UserMapper;
+import com.board.service.impl.RedisService;
 import com.board.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,13 +28,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     */
 
     private final UserMapper userMapper;
-    private final RefreshTokenMapper refreshTokenMapper;
+    private final RedisService RedisService;
+    private RedisService redisService;
     private final JwtUtil jwtUtil;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserMapper userMapper, RefreshTokenMapper refreshTokenMapper, JwtUtil jwtUtil) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserMapper userMapper, RedisService RedisService, JwtUtil jwtUtil) {
         super(authenticationManager);
         this.userMapper = userMapper;
-        this.refreshTokenMapper = refreshTokenMapper;
+        this.RedisService = RedisService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -65,31 +66,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         log.info("refreshToken 소유함");
+
         // token 만료여부 확인
-        if(JwtUtil.isExpired(refreshToken)) {
+        if(jwtUtil.isExpired(refreshToken)) {
             log.error("refreshToken 이 만료되었음");
-
-            // Refresh Token 재발급
-            String id = request.getParameter("id");
-            refreshToken = JwtUtil.createAuthJwtToken(id);
-
-            User user = User.builder()
-                            .id(id)
-                            .refreshToken(refreshToken)
-                            .build();
-            // db에 저장
-            refreshTokenMapper.saveRefreshToken(user);
-            System.out.println("refreshToken 저장 완료  ");
-
-            // 쿠키에 저장
-            response.addCookie(new Cookie("refreshToken", refreshToken));
             filterChain.doFilter(request, response);
             return;
         }
+
         log.info("JWT 만료되지 않음");
 
         // 유효한 token 에서 사용자 정보 가져오기
-        String id = jwtUtil.getUserName(refreshToken);
+        String id = redisService.getValues(refreshToken);
+
+        //String id = jwtUtil.getUserName(refreshToken);
         log.info("token 에서 가져온 사용자 ID : {}" , id);
 
         // Authentication 객체 생성 및 SecurityContextHolder에 등록

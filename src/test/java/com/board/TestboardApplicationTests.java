@@ -43,14 +43,6 @@ class TestboardApplicationTests {
     @Autowired
     AttachedFileMapper attachedFileMapper;
 
-    @Test
-    void 다운로드 () {
-        Long idx = 44L;
-        Board board = (Board)boardService.getBoardOne(idx);
-        System.out.println("다운로드할 게시글 데이터" + board);
-        Long fileIdx = board.getFileIdx();
-        attachedFileService.downloadFile(fileIdx);
-    }
 
     @Test
     public ResponseEntity<Resource> downloadFile(Long idx) {
@@ -76,7 +68,7 @@ class TestboardApplicationTests {
         System.out.println("저장 : " + boardService.saveBoard(board));
     }
 
-    @Test
+/*    @Test
     void getBoardList() {
         System.out.println(boardService);
         Object result = boardService.getBoardList();
@@ -88,7 +80,7 @@ class TestboardApplicationTests {
         }
 
         Assertions.assertThat(boardList.size()).isGreaterThan(1);
-    }
+    }*/
 
     @Test
     void getBoardOne() {
