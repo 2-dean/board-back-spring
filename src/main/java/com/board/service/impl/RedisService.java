@@ -16,7 +16,7 @@ public class RedisService {
     // 데이터 넣기
     public void setValues(String refreshToken, String id){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(refreshToken, id, Duration.ofMinutes(JwtProperties.REFRESH_EXPIRATION_TIME));
+        values.set(refreshToken, id, Duration.ofMinutes(JwtProperties.REDIS_EXPIRATION_TIME));
     }
     // 데이터 가져오기
     public String getValues(String refreshToken){

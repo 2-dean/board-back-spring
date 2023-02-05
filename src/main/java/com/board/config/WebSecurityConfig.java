@@ -1,9 +1,9 @@
 package com.board.config;
 
 import com.board.mapper.UserMapper;
-import com.board.security.AuthenticationFilter;
-import com.board.security.CustomAuthProvider;
-import com.board.security.JwtAuthorizationFilter;
+import com.board.config.security.AuthenticationFilter;
+import com.board.config.security.CustomAuthProvider;
+import com.board.config.security.JwtAuthorizationFilter;
 import com.board.service.impl.RedisService;
 import com.board.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -56,22 +56,25 @@ public class WebSecurityConfig {
                 .cors()                 //cross site -> 도메인이 다를때 허용해줌?
 
                 .and()
-                .logout()
-                .deleteCookies("JSSESSIONID", "accessToken", "refreshToken")
-
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 스프링시큐리티가 세션을 생성하지도않고 기존것을 사용하지도 않음 (JWT쓸때)
+
+                .and()
+                .authorizeRequests()    //요청에 따른 인가 설정
+                .antMatchers("/").permitAll()
+                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
+                .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
 
                 .and()
                 .addFilter(new AuthenticationFilter((CustomAuthProvider) authenticationProvider(), redisService, jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration()), userMapper, redisService, jwtUtil))
 
-                .authorizeRequests()    //요청에 따른 인가 설정
-                .antMatchers("/").permitAll()
-                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
-                .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
-                .and().build();
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .deleteCookies("accessToken", "refreshToken")
+                .and()
+                .build();
     }
 
 

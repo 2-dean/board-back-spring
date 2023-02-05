@@ -1,4 +1,4 @@
-package com.board.security;
+package com.board.config.security;
 
 import com.board.domain.User;
 import com.board.service.impl.RedisService;

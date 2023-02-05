@@ -1,8 +1,9 @@
-package com.board.security;
+package com.board.config.security;
 
 import com.board.exception.AppException;
 import com.board.exception.ErrorCode;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
