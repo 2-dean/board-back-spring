@@ -29,6 +29,7 @@ public class CustomAuthProvider implements AuthenticationProvider {
         // 비밀번호 확인
         if(!encoder.matches(password, userDetails.getPassword())) {
             throw new AppException(ErrorCode.INVALID_PASSWORD, "비밀번호가 일치하지 않음");
+            //여기서 appException 발생 시키는데 500에러로 끝남 >> 예외처리 필요
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -36,6 +37,8 @@ public class CustomAuthProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
+        //TODO 이거 뭐지
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
+
 }

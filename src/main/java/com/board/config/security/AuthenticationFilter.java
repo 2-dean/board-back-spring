@@ -35,7 +35,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         // 사용자의 로그인 정보와 함께 인증요청을 하면 해당 필터로 진입함
-        System.out.println(">> AuthenticationFilter.attemptAuthentication 실행");
+        log.info("========================[ AuthenticationFilter.attemptAuthentication ]========================");
+
         // SecurityContextHolder 에 저장할 Authentication 객체(보통 UsernamePasswordAuthenticationToken 으로 생성)만든다
         ObjectMapper objectMapper = new ObjectMapper();
         User user;
@@ -69,15 +70,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         String accessToken = jwtUtil.createAuthToken(user.getId());
         String refreshToken = jwtUtil.createRefreshToken();
-        System.out.println("accessToken 생성 : " + accessToken);
-        System.out.println("refreshToken 생성 : " + refreshToken);
 
         //db에 refresh token 저장
-        user.setRefreshToken(refreshToken);
-        System.out.println("user: " + user);
-        //RefreshToken refreshToken1 = new RefreshToken(refreshToken, user.getId());
-        redisService.setValues(user.getId(),refreshToken);
-        System.out.println("refreshToken 저장 완료  ");
+        ///
+        redisService.setValues("refreshToken",refreshToken);
+        log.info("refreshToken 저장 완료 ");
+        redisService.setAccessValues("accessToken",accessToken);
+        log.info("accessToken 저장 완료 ");
 
         // 쿠키에 저장
         response.addCookie(new Cookie("accessToken", accessToken));

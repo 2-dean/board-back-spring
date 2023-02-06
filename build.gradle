@@ -49,8 +49,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	//Log4Jdbc
-	//implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
-	//implementation 'com.oracle.database.jdbc:ojdbc6:11.2.0.4'
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+	implementation 'com.oracle.database.jdbc:ojdbc6:11.2.0.4'
 	//implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
 
 	//log4j

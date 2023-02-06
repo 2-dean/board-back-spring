@@ -1,17 +1,17 @@
 package com.board.util;
 
-import com.board.exception.AppException;
-import com.board.exception.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.netty.handler.codec.base64.Base64Encoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.*;
 
+import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
@@ -37,7 +37,7 @@ public class JwtUtil{ // JWT 생성, 디코딩
                                 .setSubject(subject)
                                 .setIssuedAt(now)
                                 .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))   // 만료일자
-                                .signWith(SignatureAlgorithm.HS256, JwtProperties.SECRET_KEY)             // HS256 알고리즘 이용, secret key 이용 암호화
+                                .signWith(SignatureAlgorithm.HS256, JwtProperties.ACCESS_SECRET_KEY)             // HS256 알고리즘 이용, secret key 이용 암호화
                                 .compact();
         } 
         if (subject.equals("refresh")) {
@@ -45,8 +45,8 @@ public class JwtUtil{ // JWT 생성, 디코딩
                                 .setHeaderParam("type","jwt")       //header 설정
                                 .setSubject(subject)
                                 .setIssuedAt(now)
-                                .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.REFRESH_EXPIRATION_TIME))   // 만료일자
-                                .signWith(SignatureAlgorithm.HS256, JwtProperties.SECRET_KEY)             // HS256 알고리즘 이용, secret key 이용 암호화
+                                .setExpiration(new Date(JwtProperties.REDIS_EXPIRATION_TIME))   // 만료일자
+                                .signWith(SignatureAlgorithm.HS256, JwtProperties.REFRESH_SECRET_KEY)             // HS256 알고리즘 이용, secret key 이용 암호화
                                 .compact();
         }
 
@@ -61,19 +61,20 @@ public class JwtUtil{ // JWT 생성, 디코딩
      * @param token String : 토큰
      * @return String : 사용자 정보
      */
-    public String getUserName(String token) {
+    public String getUserName(String token, String key) {
         System.out.println("jwt 인증 : " + token);
         return Jwts.parser()
-                    .setSigningKey(JwtProperties.SECRET_KEY)
+                    .setSigningKey(key)
                     .parseClaimsJws(token)
                     .getBody().get("id", String.class);
     }
 
     // token 만료 확인
-    public boolean isExpired(String token) {
+    public boolean isExpired(String token, String key) { //TODO key두개로 하기
         System.out.println("isExpired: " + token);
+
         try {
-            Jwts.parser().setSigningKey(JwtProperties.SECRET_KEY)
+            Jwts.parser().setSigningKey(key)
                          .parseClaimsJws(token);
             return false;
         } catch (ExpiredJwtException e) {
