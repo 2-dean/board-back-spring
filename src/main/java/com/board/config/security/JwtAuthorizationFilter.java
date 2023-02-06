@@ -43,7 +43,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("========================[ access Token 유효성 확인 ]========================");
         System.out.println("request.getRequestURI() : " + request.getRequestURI());
-        if (request.getRequestURI().equals("/")) {
+        String requestURI = request.getRequestURI();
+        //TODO 특정 url은 JwtAuthorization Filter로 들어오지 않도록
+        if (requestURI.equals("/") || requestURI.equals("/users/join")) {
             filterChain.doFilter(request, response);
         } else {
 
@@ -67,7 +69,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             }
 
             //logout 요청인지 확인
-            String requestURI = request.getRequestURI();
             if (requestURI.equals("/logout")) {
                 log.info("====logout 요청");
 
