@@ -5,6 +5,7 @@ import com.board.mapper.UserMapper;
 import com.board.service.impl.RedisService;
 import com.board.util.JwtProperties;
 import com.board.util.JwtUtil;
+import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
@@ -32,6 +34,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private final RedisService redisService;
     private final JwtUtil jwtUtil;
 
+    private String accessToken;
+    private String refreshToken;
+
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserMapper userMapper, RedisService redisService, JwtUtil jwtUtil) {
         super(authenticationManager);
         this.userMapper = userMapper;
@@ -39,96 +44,75 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.jwtUtil = jwtUtil;
     }
 
+    /*
+        1. Access 토큰 만료확인
+        2. 만료됐을 경우 Refresh 토큰 만료여부 확인
+        3. Refresh 토큰 만료됐을 경우 새로 로그인
+        4. Refresh 토큰 유효할 경우 Access 다시 발급
+        5. Access 유효할 경우 사용자 정보 SecuritycontextHolder 에 저장
+     */
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("========================[ JwtAuthorizationFilter ]========================");
-        String requestURI = request.getRequestURI();
-
-        log.info("RequestURI : " + requestURI);
         //TODO 특정 url은 JwtAuthorization Filter로 들어오지 않도록 처리하기 config 에서 처리 할 수 있는지 확인해보기, 로그인 되어있으면 회원가입 안되기~!
+        log.info(" request id : {} " ,request.getParameter("id")); //null
 
-        if (requestURI.equals("/") || requestURI.equals("/users/join")) {
-            filterChain.doFilter(request, response);
+        //0. 쿠키에서 토큰 꺼내기
+        // 특정 쿠키값만 가져올 수 있는지 확인
+        Cookie accessCookie;
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals("accessToken")) {
+                accessToken = cookie.getValue();
+                accessCookie = cookie;
+            }
+            if (cookie.getName().equals("refreshToken")) {
+                refreshToken = cookie.getValue();
+            }
+        }
+
+        //1. Access 토큰 만료확인
+        if (jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
+            log.info("accessToken 만료됨");
+
+            // 1-1. Access 만료
+            // 2. Refresh 토큰 만료여부 확인
+            if(jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY)){
+                // 2-1. Refresh 토큰 만료 > 로그인 페이지로
+                log.info("refreshToken 만료됨");
+                response.sendRedirect("/login");
+            } else {
+                // 2-2. Refresh 토큰 유효함 > Access 토큰 재발급
+                log.info("refreshToken 유효함");
+
+                // 사용자 정보 가져오기
+                String id = redisService.getValues(refreshToken);
+                User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
+
+                // 새로운 accessToken 발급 및 cookie 에 저장
+                accessToken = jwtUtil.createAccessToken(id);
+                log.info("new Access Token : {} ", accessToken);
+
+                accessCookie.setValue(accessToken);
+                //Cookie cookie = new Cookie("accessToken", accessToken);
+                response.addCookie(accessCookie);
+                redisService.setAccessValues(accessToken,id);
+
+                filterChain.doFilter(request, response);
+                // access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
+            }
 
         } else {
-            // 쿠키에서 토큰 꺼내기
-            Cookie[] cookies = request.getCookies();
-            String accessToken = "";
-            String refreshToken = "";
-
-            getToken(cookies);
-            //accessToken 꺼냄
-            //TODO for문말고 특정 쿠키값만 찝어서 가져오기
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals("accessToken")) {
-                        accessToken = cookie.getValue();
-                    }
-                    if (cookie.getName().equals("refreshToken")) {
-                        refreshToken = cookie.getValue();
-                    }
-
-                }
-            }
-
-            //logout 요청인지 확인
-            if (requestURI.equals("/logout")) {
-                log.info("====logout 요청");
-
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            log.info("[Cookie 에 저장 된 accessToken] {}", accessToken);
-
-            // token 소유여부
-            // TODO access 없고 refresh가 살아있는경우 ??  은행은 동의후에 다시 refresh 발급
-            // TODO refresh 가지고 있는데 access token 재발급 안 해줌 access, refresh 발급, 검증 따로z
-            // 쿠키확인 > 토큰 있는지 없는지 확인 >
-            if (accessToken == null) {
-                log.error("accessToken 없습니다.");
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            log.info("accessToken 소유함");
-
-            // TODO token 만료여부 확인 ㅇㅇ
-
-            if (jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
-                log.error("accessToken 이 만료되었음");
-
-                // refresh token 유효성 확인
-                if (!jwtUtil.isExpired(refreshToken,JwtProperties.REFRESH_SECRET_KEY)) {
-                    log.error("refreshToken 사용가능 >  새로운 accessToken 발급 및 cookie 저장");
-
-                    //db에서 사용자 정보 가져오기
-                    String id = redisService.getValues(refreshToken);
-
-                    //새로운 accessToken 생성
-                    accessToken = jwtUtil.createAuthToken(id);
-
-                    //쿠키에 저장 쿠키는 브라우저 닫으면 없어짐요
-                    //db에도 저장?redis에 저장 json형태로 넣어보세요..?
-                    response.addCookie(new Cookie("accessToken", accessToken));
-                }
-                log.error("refreshToken 이 만료되었음");
-                //response.sendRedirect("/");
-
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-
+            // 1-2. Access 유효함 -> 사용자 정보 SecurityContextHolder 에 저장
             log.info("accessToken 유효함");
 
-            // 유효한 token 에서 사용자 정보 가져오기
-            String id = jwtUtil.getUserName(accessToken,JwtProperties.ACCESS_SECRET_KEY);
+            // 토큰 에서 사용자 정보 가져오기
+            String id = jwtUtil.getUserName(accessToken, JwtProperties.ACCESS_SECRET_KEY);
 
             log.info("token 에서 가져온 사용자 ID : {}", id);
 
-            // Authentication 객체 생성 및 SecurityContextHolder에 등록
+            // Authentication 객체 생성 및 SecurityContextHolder 에 등록
             if (id != null) {
                 User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("해당 id의 User 없음"));
                 Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
@@ -136,13 +120,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             }
 
             filterChain.doFilter(request, response);
-
         }
-    }
-    private void getToken(Cookie[] cookies) {
-
 
     }
+
 
 
 }

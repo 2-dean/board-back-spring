@@ -2,6 +2,7 @@ package com.board.config.security;
 
 import com.board.domain.User;
 import com.board.service.impl.RedisService;
+import com.board.util.JwtProperties;
 import com.board.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
+import java.util.Date;
+
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 
 // 로그인 시도 -> 인증된 사용자로 등록하기 -> 인증된 사용자면 JWT 발행하기
@@ -28,9 +33,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final CustomAuthProvider customAuthProvider; //스프링 시큐리티 인증 수행방식 정의 API
     private final RedisService redisService;
     private final JwtUtil jwtUtil;
-
-
-
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -60,27 +62,34 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
 
-    @Override // 인증 성공시 토큰 발급
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult)
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authenticate)
             throws IOException, ServletException {
-        // 인증에 성공할 시 인증된 Account의 정보를 통해 JWT Token을 만들고 헤더(Authentication 헤더)에 포함
-        System.out.println(">> AuthenticationFilter.successfulAuthentication 실행");
+        // 인증에 성공할 시 인증된 Account의 정보를 통해 JWT Token을 만들고 cookie 에 저장
+        // 헤더(Authentication 헤더)에 포함
+        log.info("========================[ AuthenticationFilter.successfulAuthentication 실행]========================");
+        log.info("========================[>> 토큰 발행 ]========================");
+        log.info("authenticate : {}", authenticate.toString());
 
-        User user = (User) authResult.getPrincipal();
+        User user = (User) authenticate.getPrincipal();
+        String id = user.getId();
+        log.info("토큰 발행할 user 정보 : {}", id);
 
-        String accessToken = jwtUtil.createAuthToken(user.getId());
+        String accessToken = jwtUtil.createAccessToken(id);
         String refreshToken = jwtUtil.createRefreshToken();
 
         //db에 refresh token 저장
-        ///
-        redisService.setValues("refreshToken",refreshToken);
-        log.info("refreshToken 저장 완료 ");
-        redisService.setAccessValues("accessToken",accessToken);
-        log.info("accessToken 저장 완료 ");
+        redisService.setAccessValues(accessToken, id);
+        log.info("accessToken 저장 완료 > {}", accessToken);
+
+        redisService.setRefreshValues(refreshToken, id);
+        log.info("refreshToken 저장 완료 > {}", refreshToken);
+
 
         // 쿠키에 저장
         response.addCookie(new Cookie("accessToken", accessToken));
         response.addCookie(new Cookie("refreshToken", refreshToken));
+
 
 
     }

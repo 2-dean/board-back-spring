@@ -14,18 +14,22 @@ public class RedisService {
     private final RedisTemplate redisTemplate;
 
     // 데이터 넣기
-    public void setValues(String id, String refreshToken){
+    public void setAccessValues(String accessToken, String id){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(id, refreshToken, Duration.ofMinutes(JwtProperties.REDIS_EXPIRATION_TIME));
+        values.set(accessToken, id, Duration.ofMillis(JwtProperties.ACCESS_EXPIRATION_TIME));
     }
-    public void setAccessValues(String id, String access){
+    //
+    public void setRefreshValues(String refreshToken, String id){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(id, access, JwtProperties.ACCESS_EXPIRATION_TIME);
+        values.set(refreshToken, id, Duration.ofMillis(JwtProperties.REFRESH_EXPIRATION_TIME));
     }
     // 데이터 가져오기
-    public String getValues(String refreshToken){
-        System.out.println(">>> Redis 에서 가져올 token key : " + refreshToken);
+    public String getValues(String token){
+        System.out.println(">>> Redis 에서 가져올 token : " + token);
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        return values.get(refreshToken);
+
+        String id = values.get(token);
+        System.out.println(">>>>>>>> redis 에서 가져온 id : " + id);
+        return id;
     }
 }
