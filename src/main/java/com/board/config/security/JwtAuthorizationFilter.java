@@ -60,12 +60,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         //0. 쿠키에서 토큰 꺼내기
         // 특정 쿠키값만 가져올 수 있는지 확인
-        Cookie accessCookie;
 
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals("accessToken")) {
                 accessToken = cookie.getValue();
-                accessCookie = cookie;
             }
             if (cookie.getName().equals("refreshToken")) {
                 refreshToken = cookie.getValue();
@@ -94,9 +92,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 accessToken = jwtUtil.createAccessToken(id);
                 log.info("new Access Token : {} ", accessToken);
 
-                accessCookie.setValue(accessToken);
-                //Cookie cookie = new Cookie("accessToken", accessToken);
-                response.addCookie(accessCookie);
+
+                Cookie cookie = new Cookie("accessToken", accessToken);
+                response.addCookie(cookie);
                 redisService.setAccessValues(accessToken,id);
 
                 filterChain.doFilter(request, response);

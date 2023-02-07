@@ -87,7 +87,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 
         // 쿠키에 저장
-        response.addCookie(new Cookie("accessToken", accessToken));
+        Cookie accessCookie = new Cookie("accessToken", accessToken);
+        accessCookie.setMaxAge(30);
+        response.addCookie(accessCookie);
+
+
         response.addCookie(new Cookie("refreshToken", refreshToken));
 
 
