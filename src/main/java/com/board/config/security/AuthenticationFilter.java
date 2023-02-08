@@ -87,10 +87,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // 쿠키에 만료시간 설정
         Cookie accessCookie = new Cookie("accessToken", accessToken);
-        accessCookie.setMaxAge(60);     // 1분
+        accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
 
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setMaxAge(60*10); // 10분?
+        refreshCookie.setMaxAge(JwtProperties.REFRESH_COOKIE_EXPIRATION_TIME);
 
 
         // 쿠키에 저장

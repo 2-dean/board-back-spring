@@ -9,6 +9,7 @@ import com.board.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -61,18 +62,18 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 스프링시큐리티가 세션을 생성하지도않고 기존것을 사용하지도 않음 (JWT쓸때)
 
                 .and()
-                .authorizeRequests()    //요청에 따른 인가 설정
-                .antMatchers("/").permitAll()
-                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
-                .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
-
-                .and()
                 .addFilter(new AuthenticationFilter((CustomAuthProvider) authenticationProvider(), redisService, jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration()), userMapper, redisService, jwtUtil))
 
+                .authorizeRequests()    //요청에 따른 인가 설정
+                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
+                .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
+                .antMatchers(HttpMethod.GET, "/main", "/login-page").permitAll()
+
+                .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/main")
                 //.logoutSuccessHandler((request, response, authentication) -> new CompositeLogoutHandler())
                 .deleteCookies("accessToken", "refreshToken")
 

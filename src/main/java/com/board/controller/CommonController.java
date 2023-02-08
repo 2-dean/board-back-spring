@@ -11,9 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommonController {
 
-    @GetMapping("/")
+    @GetMapping("/main")
     public ResponseEntity<String> main() {
         return ResponseEntity.ok().body("메인페이지 안녕!");
+    }
+
+    @GetMapping("/login-page")
+    public ResponseEntity<String> loginPage() {
+        return ResponseEntity.ok().body("로그인페이지 안녕!");
     }
 
 }

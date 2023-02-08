@@ -1,12 +1,16 @@
 package com.board.config.security;
 
 import com.board.domain.User;
+import com.board.exception.AppException;
+import com.board.exception.ErrorCode;
 import com.board.mapper.UserMapper;
 import com.board.service.impl.RedisService;
 import com.board.util.JwtProperties;
 import com.board.util.JwtUtil;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +24,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 
 @Slf4j
@@ -60,7 +65,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         //0. 쿠키에서 토큰 꺼내기
         // 특정 쿠키값만 가져올 수 있는지 확인
-
         if(request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if (cookie.getName().equals("accessToken")) {
@@ -70,64 +74,71 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     refreshToken = cookie.getValue();
                 }
             }
-        } else {
-            filterChain.doFilter(request, response);
-        }
 
+            //1. Access 토큰 소유 여부 확인
+            if (accessToken == null || jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
+                log.info("accessToken 쿠키에 없음 == Jwt 만료되었음");
 
-        //1. Access 토큰 소유 여부 확인
-        if (accessToken == null || jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
-            log.info("accessToken 쿠키에 없거나 Jwt 만료되었음");
+                // 1-1. Access 없음
+                // 2. Refresh 토큰 만료여부 확인
+                if(jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY)){
+                    // 2-1. Refresh 토큰 만료 > 로그인 페이지로
+                    log.info("refreshToken 만료됨");
+                    response.sendRedirect("/main");
 
-            // 1-1. Access 없음
-            // 2. Refresh 토큰 만료여부 확인
-            if(jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY)){
-                // 2-1. Refresh 토큰 만료 > 로그인 페이지로
-                log.info("refreshToken 만료됨");
-                response.sendRedirect("/");
+                    filterChain.doFilter(request, response);
+
+                } else {
+                    // 2-2. Refresh 토큰 유효함 > Access 토큰 재발급
+                    log.info("refreshToken 유효함");
+
+                    // 사용자 정보 가져오기
+                    String id = redisService.getValues(refreshToken);
+                    userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
+
+                    // 새로운 accessToken 발급 및 cookie 에 저장
+                    accessToken = jwtUtil.createAccessToken(id);
+                    log.info("new Access Token : {} ", accessToken);
+
+                    Cookie accessCookie = new Cookie("accessToken", accessToken);
+                    accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
+
+                    response.addCookie(accessCookie);
+                    redisService.setAccessValues(accessToken, id);
+
+                    filterChain.doFilter(request, response);
+                    // TODO access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
+                }
 
             } else {
-                // 2-2. Refresh 토큰 유효함 > Access 토큰 재발급
-                log.info("refreshToken 유효함");
+                // 1-2. Access 유효함 -> 사용자 정보 SecurityContextHolder 에 저장
+                log.info("accessToken 유효함");
 
-                // 사용자 정보 가져오기
-                String id = redisService.getValues(refreshToken);
-                userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
+                // 토큰 에서 사용자 정보 가져오기
+                String id = jwtUtil.getUserName(accessToken, JwtProperties.ACCESS_SECRET_KEY);
 
-                // 새로운 accessToken 발급 및 cookie 에 저장
-                accessToken = jwtUtil.createAccessToken(id);
-                log.info("new Access Token : {} ", accessToken);
+                log.info("token 에서 가져온 사용자 ID : {}", id);
 
-                Cookie accessCookie = new Cookie("accessToken", accessToken);
-                accessCookie.setMaxAge(60);
-
-                response.addCookie(accessCookie);
-                redisService.setAccessValues(accessToken, id);
+                // Authentication 객체 생성 및 SecurityContextHolder 에 등록
+                if (id != null) {
+                    User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("해당 id의 User 없음"));
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
 
                 filterChain.doFilter(request, response);
-                // TODO access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
             }
+
+
 
         } else {
-            // 1-2. Access 유효함 -> 사용자 정보 SecurityContextHolder 에 저장
-            log.info("accessToken 유효함");
-
-            // 토큰 에서 사용자 정보 가져오기
-            String id = jwtUtil.getUserName(accessToken, JwtProperties.ACCESS_SECRET_KEY);
-
-            log.info("token 에서 가져온 사용자 ID : {}", id);
-
-            // Authentication 객체 생성 및 SecurityContextHolder 에 등록
-            if (id != null) {
-                User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("해당 id의 User 없음"));
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-
+            log.info("쿠키없음");
+//          response.setStatus(HttpStatus.FORBIDDEN.value());
             filterChain.doFilter(request, response);
+
         }
 
-    }
+    } //doFilterInternal
 
 
 
