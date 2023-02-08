@@ -56,49 +56,56 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("========================[ JwtAuthorizationFilter ]========================");
         //TODO 특정 url은 JwtAuthorization Filter로 들어오지 않도록 처리하기 config 에서 처리 할 수 있는지 확인해보기, 로그인 되어있으면 회원가입 안되기~!
-        log.info(" request id : {} " ,request.getParameter("id")); //null
+
 
         //0. 쿠키에서 토큰 꺼내기
         // 특정 쿠키값만 가져올 수 있는지 확인
 
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("accessToken")) {
-                accessToken = cookie.getValue();
+        if(request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("accessToken")) {
+                    accessToken = cookie.getValue();
+                }
+                if (cookie.getName().equals("refreshToken")) {
+                    refreshToken = cookie.getValue();
+                }
             }
-            if (cookie.getName().equals("refreshToken")) {
-                refreshToken = cookie.getValue();
-            }
+        } else {
+            filterChain.doFilter(request, response);
         }
 
-        //1. Access 토큰 만료확인
-        if (jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
-            log.info("accessToken 만료됨");
 
-            // 1-1. Access 만료
+        //1. Access 토큰 소유 여부 확인
+        if (accessToken == null || jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
+            log.info("accessToken 쿠키에 없거나 Jwt 만료되었음");
+
+            // 1-1. Access 없음
             // 2. Refresh 토큰 만료여부 확인
             if(jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY)){
                 // 2-1. Refresh 토큰 만료 > 로그인 페이지로
                 log.info("refreshToken 만료됨");
-                response.sendRedirect("/login");
+                response.sendRedirect("/");
+
             } else {
                 // 2-2. Refresh 토큰 유효함 > Access 토큰 재발급
                 log.info("refreshToken 유효함");
 
                 // 사용자 정보 가져오기
                 String id = redisService.getValues(refreshToken);
-                User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
+                userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
 
                 // 새로운 accessToken 발급 및 cookie 에 저장
                 accessToken = jwtUtil.createAccessToken(id);
                 log.info("new Access Token : {} ", accessToken);
 
+                Cookie accessCookie = new Cookie("accessToken", accessToken);
+                accessCookie.setMaxAge(60);
 
-                Cookie cookie = new Cookie("accessToken", accessToken);
-                response.addCookie(cookie);
-                redisService.setAccessValues(accessToken,id);
+                response.addCookie(accessCookie);
+                redisService.setAccessValues(accessToken, id);
 
                 filterChain.doFilter(request, response);
-                // access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
+                // TODO access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
             }
 
         } else {

@@ -12,7 +12,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Component
 @Slf4j
-public class JwtUtil{ // JWT 생성, 디코딩
+public class JwtUtil{ // JWT 생성, 디코딩, 만료
 
     private Date now = new Date(System.currentTimeMillis());
     private String token;
@@ -21,12 +21,10 @@ public class JwtUtil{ // JWT 생성, 디코딩
     public String createAccessToken(String id) {
         return create(id, "accessToken");
     }
-
     // Refresh Token 생성
     public String createRefreshToken() {
         return create(null, "refreshToken");
     }
-
 
     /**
      * 토큰과 key 를 받아서 사용자 정보를 반환
@@ -36,7 +34,8 @@ public class JwtUtil{ // JWT 생성, 디코딩
      * @return
      */
     public String getUserName(String token, String key) {
-        System.out.println("jwt 인증 : " + token);
+        log.info("인증할 토큰 : " + token);
+        log.info("인증할 key : " + key);
         return Jwts.parser()
                     .setSigningKey(key)
                     .parseClaimsJws(token)
@@ -51,7 +50,7 @@ public class JwtUtil{ // JWT 생성, 디코딩
      * @return
      */
     public boolean isExpired(String token, String key) { //TODO key두개로 하기
-        System.out.println("isExpired: " + token);
+        log.info("isExpired: " + token);
 
         try {
             Jwts.parser()
@@ -65,11 +64,11 @@ public class JwtUtil{ // JWT 생성, 디코딩
 
     }
 
-    /**
-     * 토큰 생성
-     * @param authentication
+    /** 토큰 생성
+     *
+     * @param id
      * @param subject
-     * @return
+     * @return "token 값
      */
     private String create(String id, String subject) {
         if (subject.equals("accessToken") ){

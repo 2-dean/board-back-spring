@@ -2,6 +2,7 @@ package com.board.service.impl;
 
 import com.board.util.JwtProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RedisService {
     private final RedisTemplate redisTemplate;
 
@@ -25,11 +27,11 @@ public class RedisService {
     }
     // 데이터 가져오기
     public String getValues(String token){
-        System.out.println(">>> Redis 에서 가져올 token : " + token);
+        log.info(">>> Redis 에서 가져올 token : " + token);
         ValueOperations<String, String> values = redisTemplate.opsForValue();
 
         String id = values.get(token);
-        System.out.println(">>>>>>>> redis 에서 가져온 id : " + id);
+        log.info(">>>>>>>> redis 에서 가져온 id : " + id);
         return id;
     }
 }

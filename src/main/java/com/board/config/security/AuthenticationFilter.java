@@ -81,18 +81,21 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         //db에 refresh token 저장
         redisService.setAccessValues(accessToken, id);
         log.info("accessToken 저장 완료 > {}", accessToken);
-
         redisService.setRefreshValues(refreshToken, id);
         log.info("refreshToken 저장 완료 > {}", refreshToken);
 
 
-        // 쿠키에 저장
+        // 쿠키에 만료시간 설정
         Cookie accessCookie = new Cookie("accessToken", accessToken);
-        accessCookie.setMaxAge(30);
+        accessCookie.setMaxAge(60);     // 1분
+
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setMaxAge(60*10); // 10분?
+
+
+        // 쿠키에 저장
         response.addCookie(accessCookie);
-
-
-        response.addCookie(new Cookie("refreshToken", refreshToken));
+        response.addCookie(refreshCookie);
 
 
 

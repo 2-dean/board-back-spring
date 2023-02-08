@@ -18,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
 
 @Configuration
 @EnableWebSecurity //스프링 시큐리티 필터가 스프링 필터 체인에 등록
@@ -72,7 +73,9 @@ public class WebSecurityConfig {
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
+                //.logoutSuccessHandler((request, response, authentication) -> new CompositeLogoutHandler())
                 .deleteCookies("accessToken", "refreshToken")
+
                 .and()
                 .build();
     }
