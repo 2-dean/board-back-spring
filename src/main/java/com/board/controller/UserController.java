@@ -3,6 +3,7 @@ package com.board.controller;
 import com.board.domain.User;
 import com.board.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -20,6 +22,19 @@ public class UserController {
     private final UserService userService;
     private final UserDetailsService userDetailsService;
     private String resultMessage;
+
+
+    //TODO 로그인 사용자 정보 보내주기
+    @PostMapping
+    public ResponseEntity<User> userInfo(@RequestBody User user) {
+        log.info("userInfo 요청 userId : {}", user.getId());
+        User findUser = userService.findUser(user.getId());
+        log.info("findUser : {}", findUser.toString());
+
+
+        return ResponseEntity.ok(findUser);
+    }
+
 
     @PostMapping("/join")
     public ResponseEntity<String> join(@RequestBody User user) {

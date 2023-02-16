@@ -69,37 +69,38 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 헤더(Authentication 헤더)에 포함
         log.info("========================[ AuthenticationFilter.successfulAuthentication 실행]========================");
         log.info("========================[>> 토큰 발행 ]========================");
-        log.info("authenticate : {}", authenticate.toString());
 
-        User user = (User) authenticate.getPrincipal();
-        String id = user.getId();
-        log.info("토큰 발행할 user 정보 : {}", id);
+            log.info("authenticate : {}", authenticate.toString());
 
-        String accessToken = jwtUtil.createAccessToken(id);
-        String refreshToken = jwtUtil.createRefreshToken();
+            User user = (User) authenticate.getPrincipal();
+            String id = user.getId();
+            log.info("토큰 발행할 user 정보 : {}", id);
 
-        //db에 refresh token 저장
-        redisService.setAccessValues(accessToken, id);
-        log.info("accessToken 저장 완료 > {}", accessToken);
-        redisService.setRefreshValues(refreshToken, id);
-        log.info("refreshToken 저장 완료 > {}", refreshToken);
+            String accessToken = jwtUtil.createAccessToken(id);
+            String refreshToken = jwtUtil.createRefreshToken();
 
-
-        // 쿠키에 만료시간 설정
-        Cookie accessCookie = new Cookie("accessToken", accessToken);
-        accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
-
-        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setMaxAge(JwtProperties.REFRESH_COOKIE_EXPIRATION_TIME);
+            //db에 refresh token 저장
+            redisService.setAccessValues(accessToken, id);
+            log.info("accessToken 저장 완료 > {}", accessToken);
+            redisService.setRefreshValues(refreshToken, id);
+            log.info("refreshToken 저장 완료 > {}", refreshToken);
 
 
-        // 쿠키에 저장
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
+            // 쿠키에 만료시간 설정
+            Cookie accessCookie = new Cookie("accessToken", accessToken);
+            accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
+
+            Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+            refreshCookie.setMaxAge(JwtProperties.REFRESH_COOKIE_EXPIRATION_TIME);
 
 
+            // 쿠키에 저장
+            response.addCookie(accessCookie);
+            response.addCookie(refreshCookie);
 
-    }
+        }
+
+
 
 
 }
