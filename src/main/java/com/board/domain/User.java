@@ -30,11 +30,6 @@ public class User implements UserDetails {
     private String name;
     @Schema(description = "역할", nullable = false)
     private Role role;
-    @Schema(description = "accessToken")
-    private String accessToken;
-    @Schema(description = "refreshToken")
-    private String refreshToken;
-
 
 
     @Override

@@ -1,17 +1,16 @@
 package com.board.controller;
 
 import com.board.domain.User;
+import com.board.dto.UserDTO;
 import com.board.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -27,10 +26,10 @@ public class UserController {
     //TODO 로그인 사용자 정보 보내주기
     @PostMapping
     public ResponseEntity<User> userInfo(@RequestBody User user) {
+        log.info("user: {}", user.toString());
         log.info("userInfo 요청 userId : {}", user.getId());
         User findUser = userService.findUser(user.getId());
         log.info("findUser : {}", findUser.toString());
-
 
         return ResponseEntity.ok(findUser);
     }
