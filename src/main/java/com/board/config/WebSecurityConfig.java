@@ -92,7 +92,9 @@ public class WebSecurityConfig {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/main")
+
+                //TODO 프론트에서 처리하게
+                //.logoutSuccessUrl("/main")
                 //.logoutSuccessHandler((request, response, authentication) -> new CompositeLogoutHandler())
                 .deleteCookies("accessToken", "refreshToken")
 
