@@ -105,6 +105,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
                     response.addCookie(accessCookie);
                     redisService.setAccessValues(accessToken, id);
+                    log.info("new Access Token 쿠키에 저장완료");
 
                     filterChain.doFilter(request, response);
                     // TODO access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
