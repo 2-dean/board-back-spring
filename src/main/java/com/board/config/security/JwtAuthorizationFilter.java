@@ -62,24 +62,26 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         log.info("========================[ JwtAuthorizationFilter ]========================");
         //TODO 특정 url은 JwtAuthorization Filter로 들어오지 않도록 처리하기 config 에서 처리 할 수 있는지 확인해보기, 로그인 되어있으면 회원가입 안되기~!
 
-
         //0. 쿠키에서 토큰 꺼내기
-        // 특정 쿠키값만 가져올 수 있는지 확인
+        accessToken = request.getHeader("accessToken");
+        log.info("accessToken : {}", accessToken);
+
+        //TODO 특정 쿠키값만 가져올 수 있는지 확인
         if(request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("accessToken")) {
+               /* if (cookie.getName().equals("accessToken")) {
                     accessToken = cookie.getValue();
-                }
+                }*/
                 if (cookie.getName().equals("refreshToken")) {
                     refreshToken = cookie.getValue();
                 }
             }
 
-            //1. Access 토큰 소유 여부 확인
-            if (accessToken == null || jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
-                log.info("accessToken 쿠키에 없음 == Jwt 만료되었음");
+            //1. Access 토큰 만료 확인
+            if (jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
+                log.info("accessToken 만료되었음");
 
-                // 1-1. Access 없음
+                // 1-1. Access 만료
                 // 2. Refresh 토큰 만료여부 확인
                 if(jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY)){
                     // 2-1. Refresh 토큰 만료 > 로그인 페이지로
@@ -100,14 +102,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     accessToken = jwtUtil.createAccessToken(id);
                     log.info("new Access Token : {} ", accessToken);
 
-                    Cookie accessCookie = new Cookie("accessToken", accessToken);
-                    accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
+                    //Cookie accessCookie = new Cookie("accessToken", accessToken);
+                    //accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
+                    //response.addCookie(accessCookie);
 
-                    response.addCookie(accessCookie);
+                    response.addHeader("accessToken", accessToken);
                     redisService.setAccessValues(accessToken, id);
-                    log.info("new Access Token 쿠키에 저장완료");
+                    log.info("new Access Token Cookie 에  저장완료");
 
-                    filterChain.doFilter(request, response);
+//                    filterChain.doFilter(request, response);
                     // TODO access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
                 }
 
