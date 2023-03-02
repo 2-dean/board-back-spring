@@ -81,6 +81,10 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
                     .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))   // 만료일자
                     .signWith(SignatureAlgorithm.HS256, JwtProperties.ACCESS_SECRET_KEY)             // HS256 알고리즘 이용, secret key 이용 암호화
                     .compact();
+            log.info("token : {}", token);
+
+            token = (JwtProperties.TOKEN_PREFIX + token);
+            log.info("Bearer Token : {} ", token);
         }
         if (subject.equals("refreshToken")) {
             token = Jwts.builder()
@@ -95,6 +99,8 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
 
         return token;
     }
+
+
 
 
 }

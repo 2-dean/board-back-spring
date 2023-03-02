@@ -87,8 +87,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 
             //TODO AccessToken header에 저장
-            response.addHeader("accessToken", accessToken);
-            log.info("accessToken Header에 저장");
+            response.addHeader("Authorization", accessToken);
+            log.info("accessToken Header 에 저장");
             //Cookie accessCookie = new Cookie("accessToken", accessToken);
             //accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
             //response.addCookie(accessCookie);

@@ -62,8 +62,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         log.info("========================[ JwtAuthorizationFilter ]========================");
         //TODO 특정 url은 JwtAuthorization Filter로 들어오지 않도록 처리하기 config 에서 처리 할 수 있는지 확인해보기, 로그인 되어있으면 회원가입 안되기~!
 
-        //0. 쿠키에서 토큰 꺼내기
-        accessToken = request.getHeader("accessToken");
+        //0. 토큰 꺼내기
+        accessToken = request.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, "");
         log.info("accessToken : {}", accessToken);
 
         //TODO 특정 쿠키값만 가져올 수 있는지 확인
@@ -105,12 +105,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     //Cookie accessCookie = new Cookie("accessToken", accessToken);
                     //accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
                     //response.addCookie(accessCookie);
-
-                    response.addHeader("accessToken", accessToken);
+                    //response.addHeader("accessToken", accessToken);
+                    response.addHeader("Authorization", accessToken);
                     redisService.setAccessValues(accessToken, id);
-                    log.info("new Access Token Cookie 에  저장완료");
+                    log.info("new Access Token Header 에 저장완료");
 
-//                    filterChain.doFilter(request, response);
+                    filterChain.doFilter(request, response);
                     // TODO access 토큰 유효시간 보다 refresh 토큰 유효시간이 짧을 경우 refresh 도 다시 발급 해주기 >> 나중에 구현해도됨
                 }
 
