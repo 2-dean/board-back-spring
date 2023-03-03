@@ -76,29 +76,31 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             String id = user.getId();
             log.info("토큰 발행할 user 정보 : {}", id);
 
-            String accessToken = jwtUtil.createAccessToken(id);
+            //jwt 생성
+            String accessToken = jwtUtil.createAccessToken(id); //Bearer
             String refreshToken = jwtUtil.createRefreshToken();
 
-            //db에 refresh token 저장
+            //redis 에 jwt 저장
             redisService.setAccessValues(accessToken, id);
             log.info("accessToken [Redis] 저장 완료 > {}", accessToken);
             redisService.setRefreshValues(refreshToken, id);
             log.info("refreshToken [Redis] 저장 완료 > {}", refreshToken);
 
+            // AccessToken header 에 저장
+            long now = new Date().getTime();
+            long expireTime = now + JwtProperties.ACCESS_EXPIRATION_TIME;
+            log.info("now : {}" , expireTime);
+            log.info("expireTime : {}", expireTime);
 
-            //TODO AccessToken header에 저장
             response.addHeader("Authorization", accessToken);
+            response.addHeader("expireTime", String.valueOf(expireTime));
             log.info("accessToken Header 에 저장");
-            //Cookie accessCookie = new Cookie("accessToken", accessToken);
-            //accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
-            //response.addCookie(accessCookie);
 
             // refreshToken 쿠키에 저장
             Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
             refreshCookie.setMaxAge(JwtProperties.REFRESH_COOKIE_EXPIRATION_TIME);
             response.addCookie(refreshCookie);
             log.info("refreshToken 쿠키에 저장");
-
 
         }
 

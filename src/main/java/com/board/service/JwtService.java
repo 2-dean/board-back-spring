@@ -20,31 +20,25 @@ public class JwtService {
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
 
-    public Map<String, String> createRefreshToken(Map<String, String>  refreshTokenInfo){
+    public Map<String, String> createRefreshToken(Map<String, String> refreshTokenInfo){
         String refreshToken = refreshTokenInfo.get("refreshToken");
-        String id = refreshTokenInfo.get("id");
 
         Map<String, String> map = new HashMap<>();
 
-
+        // refreshToken 만료 확인
         boolean expired = jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY);
 
         if(expired) {
             log.info("refreshToken 만료");
-
-            map.put("errortype", "Forbidden");
-            map.put("status", "402");
-            map.put("message", "Refresh 토큰이 만료되었습니다. 로그인이 필요합니다.");
         }
         if(!expired) {
             log.info("refreshToken 유효");
+            String id = redisService.getValues(refreshToken);
 
-            String createdAccessToken = jwtUtil.createAccessToken(id);
-            redisService.setAccessValues(createdAccessToken, id);
+            String newAccessToken = jwtUtil.createAccessToken(id);
+            redisService.setAccessValues(newAccessToken, id);
 
-            map.put("status", "200");
-            map.put("message", "Refresh 토큰을 통한 Access Token 생성이 완료되었습니다.");
-            map.put("accessToken", createdAccessToken);
+            map.put("accessToken", newAccessToken);
         }
 
         return map;

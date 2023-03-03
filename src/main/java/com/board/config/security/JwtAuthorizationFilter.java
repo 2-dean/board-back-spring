@@ -102,10 +102,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     accessToken = jwtUtil.createAccessToken(id);
                     log.info("new Access Token : {} ", accessToken);
 
-                    //Cookie accessCookie = new Cookie("accessToken", accessToken);
-                    //accessCookie.setMaxAge(JwtProperties.ACCESS_COOKIE_EXPIRATION_TIME);
-                    //response.addCookie(accessCookie);
-                    //response.addHeader("accessToken", accessToken);
                     response.addHeader("Authorization", accessToken);
                     redisService.setAccessValues(accessToken, id);
                     log.info("new Access Token Header 에 저장완료");

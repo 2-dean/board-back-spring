@@ -62,6 +62,7 @@ public class WebSecurityConfig {
         config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.addExposedHeader("Authorization");
+        config.addExposedHeader("expireTime");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
