@@ -76,6 +76,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     refreshToken = cookie.getValue();
                 }
             }
+            log.info("refreshToken : " + refreshToken);
 
             //1. Access 토큰 만료 확인
             if (jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY)) {
@@ -129,10 +130,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 filterChain.doFilter(request, response);
             }
 
-
-
-        } else {
-            log.info("쿠키없음");
+        }  else {
+            log.info("request getCookies >> ß쿠키없음");
 //          response.setStatus(HttpStatus.FORBIDDEN.value());
             filterChain.doFilter(request, response);
 

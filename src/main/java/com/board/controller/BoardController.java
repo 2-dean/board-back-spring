@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.Map;
 //@RequestMapping("/api/boards")
 //@RequestMapping("/boards")
 @Tag(name = "Board", description = "게시판 api")
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class BoardController {
@@ -36,7 +38,8 @@ public class BoardController {
     //게시글 전체 조회(페이지)
     @Operation(summary = "게시판 전체 목록 조회", description = "pageNum 입력")
     @GetMapping("/boards/{pageNum}")
-    public ResponseEntity<PageInfo> selectCityList(@PathVariable("pageNum") Integer pageNum){
+    public ResponseEntity<PageInfo> selectBoardList(@PathVariable("pageNum") Integer pageNum){
+        log.info("selectBoardList >> ");
         try{
             PageInfo<Board> list = boardService.getBoardList(pageNum, pageSize);
             System.out.println(list);

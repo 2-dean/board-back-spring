@@ -61,8 +61,9 @@ public class WebSecurityConfig {
         config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         config.setAllowedMethods(Arrays.asList("HEAD","POST","GET","DELETE","PUT"));
         config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
         config.addExposedHeader("Authorization");
-        config.addExposedHeader("expireTime");
+        config.addExposedHeader("refreshToken");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
@@ -83,15 +84,18 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 스프링시큐리티가 세션을 생성하지도않고 기존것을 사용하지도 않음 (JWT쓸때)
 
                 .and()
+                .authorizeRequests()//요청에 따른 인가 설정
+                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
+                .and()
+                .authorizeRequests()
+                .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
+                .antMatchers(HttpMethod.GET, "/main", "/login-page", "/users/join").permitAll()
+
+                .and()
                 .addFilter(new AuthenticationFilter((CustomAuthProvider) authenticationProvider(), redisService, jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration()), userMapper, redisService, jwtUtil))
 
-                .authorizeRequests()    //요청에 따른 인가 설정
-                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
-                .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
-                .antMatchers(HttpMethod.GET, "/main", "/login-page").permitAll()
 
-                .and()
                 .logout()
                 .logoutUrl("/logout")
 

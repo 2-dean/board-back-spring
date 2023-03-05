@@ -50,7 +50,7 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
      * @return
      */
     public boolean isExpired(String token, String key) { //TODO key두개로 하기
-        log.info("isExpired: " + token);
+        log.info("만료 확인할 token : " + token);
 
         try {
             Jwts.parser()
