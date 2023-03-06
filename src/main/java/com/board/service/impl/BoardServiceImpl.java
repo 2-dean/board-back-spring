@@ -33,6 +33,11 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    public List<Board> getBoardListAll() {
+        return boardMapper.getBoardList();
+    }
+
+    @Override
     public Object getBoardOne(Long idx) {
         Board board = boardMapper.getBoardOne(idx);
         if (board == null){

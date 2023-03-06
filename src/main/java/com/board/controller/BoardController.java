@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //@RequestMapping("/api/boards")
@@ -34,6 +35,21 @@ public class BoardController {
 
     //페이지당 수량
     private final int pageSize = 5;
+
+    //게시글 전체 조회
+    @Operation(summary = "게시판 전체 목록 조회")
+    @GetMapping("/boards")
+    public ResponseEntity<List<Board>> getBoardListAll(){
+        log.info("AllBoardList >> ");
+        try{
+            List<Board> list = boardService.getBoardListAll();
+            System.out.println(list);
+            return ResponseEntity.ok(list);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     //게시글 전체 조회(페이지)
     @Operation(summary = "게시판 전체 목록 조회", description = "pageNum 입력")

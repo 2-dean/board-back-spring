@@ -15,6 +15,7 @@ public interface BoardService {
 
     //게시글 목록 (페이징)
     PageInfo<Board> getBoardList(int pageNo, int pageSize);
+    List<Board> getBoardListAll();
 
     //게시글 1개 조회
     Object getBoardOne(Long idx);

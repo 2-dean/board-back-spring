@@ -9,11 +9,10 @@ public interface JwtProperties {
     String REFRESH_SECRET_KEY = "secretkey222";
 
     // DB 저장 만료시간 - 밀리 초
-    Long ACCESS_EXPIRATION_TIME = 1000L * 30;       //1분   / 10분 1000 * 60 * 10L;
-    Long REFRESH_EXPIRATION_TIME = 1000L * 60 * 60;  //1시간   / 1일 1000 * 60 * 60 * 24L;
+    Long ACCESS_EXPIRATION_TIME = 1000L * 60 * 60 ;      //1시간   / 10분 1000 * 60 * 10L;
+    Long REFRESH_EXPIRATION_TIME = 1000L * 60 * 60 * 3;  //3시간   / 1일 1000 * 60 * 60 * 24L;
 
     // 쿠키 만료시간 - 초
-    int ACCESS_COOKIE_EXPIRATION_TIME = 60;         //1분
-    int REFRESH_COOKIE_EXPIRATION_TIME = 60 * 5;    //3분
+    int REFRESH_COOKIE_EXPIRATION_TIME = 60 * 60 * 3;    //3시간
 
 }
