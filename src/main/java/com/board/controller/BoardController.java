@@ -52,7 +52,7 @@ public class BoardController {
 
 
     //게시글 전체 조회(페이지)
-    @Operation(summary = "게시판 전체 목록 조회", description = "pageNum 입력")
+    @Operation(summary = "게시판 전체 목록 조회(백엔드페이징)", description = "pageNum 입력")
     @GetMapping("/boards/{pageNum}")
     public ResponseEntity<PageInfo> selectBoardList(@PathVariable("pageNum") Integer pageNum){
         log.info("selectBoardList >> ");
@@ -72,6 +72,18 @@ public class BoardController {
         Map<String, Object> boardAndComment = new HashMap<>();
         boardAndComment.put("Board", boardService.getBoardOne(idx));
         boardAndComment.put("Comment", commentService.getComment(idx, pageNum, pageSize));
+
+        return boardAndComment;
+    }
+
+
+    //게시글 1개 조회
+    @Operation(summary = "게시글 1개와 댓글 조회", description = "게시글 번호와 댓글 페이지 입력")
+    @GetMapping("/board/{idx}")
+    public Object getBoard(@PathVariable("idx") Long idx) {
+        Map<String, Object> boardAndComment = new HashMap<>();
+        boardAndComment.put("Board", boardService.getBoardOne(idx));
+        //boardAndComment.put("Comment", commentService.getComment(idx, pageNum, pageSize));
 
         return boardAndComment;
     }

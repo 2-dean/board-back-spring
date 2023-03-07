@@ -34,8 +34,9 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
      * @return
      */
     public String getUserName(String token, String key) {
-        log.info("인증할 토큰 : " + token);
-        log.info("인증할 key : " + key);
+        log.info("[ JwtUtil.getUserName 실행 ]========================");
+        log.info("[토큰] : \n {} " , token);
+        log.info("[key] : \n {}", key);
         return Jwts.parser()
                     .setSigningKey(key)
                     .parseClaimsJws(token)
@@ -49,18 +50,13 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
      * @param token
      * @return
      */
-    public boolean isExpired(String token, String key) { //TODO key두개로 하기
-        log.info("만료 확인할 token : " + token);
+    public void isExpired(String token, String key) throws ExpiredJwtException {
+        log.info("[ JwUtil.isExpired ]========================");
+        log.info("[ 만료 확인할 token : \n{}", token);
 
-        try {
             Jwts.parser()
                 .setSigningKey(key)
                 .parseClaimsJws(token);
-            return false;
-        } catch (ExpiredJwtException e) {
-            log.info("토큰 만료됨");
-            return true;
-        }
 
     }
 
@@ -72,7 +68,7 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
      */
     private String create(String id, String subject) {
         if (subject.equals("accessToken") ){
-            log.info("access token 생성할 id : {} ", id);
+            log.info("[ access token 생성할 id ] : {} ", id);
             token = Jwts.builder()
                     .setHeaderParam("type", "jwt")      //header 설정
                     .claim("id", id)                        //payload 설정 - claim 정보 포함
@@ -81,10 +77,9 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
                     .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_EXPIRATION_TIME))   // 만료일자
                     .signWith(SignatureAlgorithm.HS256, JwtProperties.ACCESS_SECRET_KEY)             // HS256 알고리즘 이용, secret key 이용 암호화
                     .compact();
-            log.info("token : {}", token);
-
+            log.info("[ 생성된 token ] : \n{}", token);
             token = (JwtProperties.TOKEN_PREFIX + token);
-            log.info("Bearer Token : {} ", token);
+            log.info("[ 생성된 Bearer Token ] : \n{} ", token);
         }
         if (subject.equals("refreshToken")) {
             token = Jwts.builder()

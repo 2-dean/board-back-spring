@@ -70,7 +70,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         log.info("========================[ AuthenticationFilter.successfulAuthentication 실행]========================");
         log.info("========================[>> 토큰 발행 ]========================");
 
-            log.info("authenticate : {}", authenticate.toString());
+            log.info("authenticate : \n{}", authenticate.toString());
 
             User user = (User) authenticate.getPrincipal();
             String id = user.getId();
@@ -82,18 +82,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
             //redis 에 jwt 저장
             redisService.setAccessValues(accessToken, id);
-            log.info("accessToken [Redis] 저장 완료 > {}", accessToken);
+            log.info("accessToken [Redis] 저장 완료 > \n{}", accessToken);
             redisService.setRefreshValues(refreshToken, id);
-            log.info("refreshToken [Redis] 저장 완료 > {}", refreshToken);
+            log.info("refreshToken [Redis] 저장 완료 > \n{}", refreshToken);
 
             // AccessToken header 에 저장
-            long now = new Date().getTime();
-            long expireTime = now + JwtProperties.ACCESS_EXPIRATION_TIME;
-            log.info("now : {}" , expireTime);
-            log.info("expireTime : {}", expireTime);
-
             response.addHeader("Authorization", accessToken);
-            response.addHeader("expireTime", String.valueOf(expireTime));
             log.info("accessToken Header 에 저장");
 
             // refreshToken 쿠키에 저장
