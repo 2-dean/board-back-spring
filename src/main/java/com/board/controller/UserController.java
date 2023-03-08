@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -58,10 +61,10 @@ public class UserController {
         return ResponseEntity.ok().body("로그인 요청함 ");
     }*/
 
-    @RequestMapping("/logout")
-    public void logout () {
-        System.out.println(">> 로그아웃 요청");
-        // accessToken 삭제?
+    //@PostMapping("/logout")
+    public ResponseEntity<String> logout (HttpServletResponse response, HttpServletRequest request) {
+        log.info(">> 로그아웃 요청 들어옴");
+        return userService.logout(response, request);
     }
 
 }

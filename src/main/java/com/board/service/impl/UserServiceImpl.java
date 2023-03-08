@@ -5,10 +5,18 @@ import com.board.domain.User;
 import com.board.mapper.UserMapper;
 import com.board.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -46,8 +54,21 @@ public class UserServiceImpl implements UserService {
 
 
 
-    public void logout (String id) {
-        //토큰 지우기
+    public ResponseEntity<String> logout (HttpServletResponse response, HttpServletRequest request) {
+        log.info("UserServiceImpl.logout()실행");
+
+        log.info("Header 에 accessToken null 입력");
+        response.setHeader("Authorization", null);
+
+        log.info("Cookie refreshToken 만료시키기");
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals("refreshToken")) {
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

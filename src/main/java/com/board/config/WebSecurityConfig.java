@@ -1,5 +1,6 @@
 package com.board.config;
 
+import com.board.config.security.CustomLogoutHandler;
 import com.board.mapper.UserMapper;
 import com.board.config.security.AuthenticationFilter;
 import com.board.config.security.CustomAuthProvider;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -19,7 +21,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -37,6 +39,7 @@ public class WebSecurityConfig {
     private final RedisService redisService;
     private final BCryptPasswordEncoder encoder;
     private final UserDetailsService userDetailsService;
+
 
     @Bean
     AuthenticationConfiguration authenticationConfiguration () {
@@ -95,14 +98,10 @@ public class WebSecurityConfig {
                 .addFilter(new AuthenticationFilter((CustomAuthProvider) authenticationProvider(), redisService, jwtUtil))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(authenticationConfiguration()), userMapper, redisService, jwtUtil))
 
-
+                //TODO 0309 logoutSuccessHandler 구현
                 .logout()
-                .logoutUrl("/logout")
-
-                //TODO 프론트에서 처리하게
-                //.logoutSuccessUrl("/main")
-                //.logoutSuccessHandler((request, response, authentication) -> new CompositeLogoutHandler())
-                .deleteCookies("accessToken", "refreshToken")
+                .addLogoutHandler(new CustomLogoutHandler())
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
 
                 .and()
                 .build();

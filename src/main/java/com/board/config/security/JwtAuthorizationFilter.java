@@ -68,10 +68,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         accessToken = request.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, "");
         log.info("[ request 에서 accessToken 꺼내기 ] : \n {}", accessToken);
 
+        // TODO null exception 만 발생하는데 !!! 확인하기 >> 비로그인 상태에서 board url 접근 테스트
         try {
             log.info("[ request 에서 getCookies ] - try ");
             request.getCookies();
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             log.info("[ refresh Token 가져오기 request.getCookies ] >> 쿠키없음");
             response.setStatus(HttpStatus.FORBIDDEN.value());
         }
@@ -80,9 +81,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         for (Cookie cookie : request.getCookies()) {
             if (cookie.getName().equals("refreshToken")) {
                 refreshToken = cookie.getValue();
+                log.info("[ refreshToken 확인 ] : \n{} ", refreshToken);
             }
         }
-        log.info("[ request 에서 refreshToken 꺼내기 ] : " + refreshToken);
+
 
         //1. Access 토큰 만료 확인
         try {
@@ -133,12 +135,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 response.addCookie(refreshCookie);
                 log.info("[NEW] refresh Token || response Cookie 에 추가");
 
-                response.setStatus(HttpStatus.NOT_ACCEPTABLE.value()); //Not Acceptable(접수할 수 없음)
-                //filterChain.doFilter(request, response);
+                response.setStatus(HttpStatus.NOT_ACCEPTABLE.value()); //Not Acceptable(접수할 수 없음) === 406
+
 
             } catch (ExpiredJwtException exception) {
                 log.error("[ !!! refreshToken Expired : 다시로그인필요 =========================]");
-                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+                //logout 호출
             }
         }
 
