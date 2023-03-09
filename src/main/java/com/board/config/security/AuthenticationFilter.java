@@ -7,6 +7,7 @@ import com.board.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,10 +19,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Date;
-
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 
 // 로그인 시도 -> 인증된 사용자로 등록하기 -> 인증된 사용자면 JWT 발행하기
@@ -46,7 +43,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         try {
             user = objectMapper.readValue(request.getInputStream(), User.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            throw new RuntimeException("아이디 비밀번호 입력하세요");
         }
 
         UsernamePasswordAuthenticationToken authenticationToken =

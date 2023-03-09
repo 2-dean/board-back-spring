@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,6 +16,11 @@ import java.util.Map;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper commentMapper;
+
+    @Override
+    public List<Comment> getComments(Long boardIdx) {
+        return commentMapper.getComment(boardIdx);
+    }
 
     @Override
     public PageInfo<Comment> getComment(Long boardIdx, int pageNum, int pageSize) {

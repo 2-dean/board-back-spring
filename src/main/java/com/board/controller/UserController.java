@@ -26,7 +26,7 @@ public class UserController {
     private String resultMessage;
 
 
-    //TODO 로그인 사용자 정보 보내주기
+    // 로그인 사용자 정보 보내주기
     @PostMapping
     public ResponseEntity<User> userInfo(@RequestBody User user) {
         log.info("user: {}", user.toString());

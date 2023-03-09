@@ -9,6 +9,7 @@ import java.util.Map;
 
 public interface CommentService {
     //게시글에 달린 댓글
+    List<Comment> getComments(Long boardIdx);
     PageInfo<Comment> getComment(Long boardIdx, int pageNum, int pageSize);
 
     //댓글 작성

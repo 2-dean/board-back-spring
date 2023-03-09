@@ -37,7 +37,7 @@ public class BoardController {
     private final int pageSize = 5;
 
     //게시글 전체 조회
-    @Operation(summary = "게시판 전체 목록 조회")
+    @Operation(summary = "게시판 전체 목록 조회", description = "front 에서 페이징 필요")
     @GetMapping("/boards")
     public ResponseEntity<List<Board>> getBoardListAll(){
         log.info("AllBoardList >> ");
@@ -48,6 +48,16 @@ public class BoardController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @Operation(summary = "게시글 1개와 댓글 조회", description = "front 에서 댓글 페이징 필요")
+    @GetMapping("/board/{idx}")
+    public Object getBoardAndComments(@PathVariable("idx") Long idx) {
+        Map<String, Object> boardAndComment = new HashMap<>();
+        boardAndComment.put("Board", boardService.getBoardOne(idx));        // 게시글 정보
+        boardAndComment.put("Comment", commentService.getComments(idx));    // 게시글에 달린 댓글들
+
+        return boardAndComment;
     }
 
 
@@ -77,16 +87,6 @@ public class BoardController {
     }
 
 
-    //게시글 1개 조회
-    @Operation(summary = "게시글 1개와 댓글 조회", description = "게시글 번호와 댓글 페이지 입력")
-    @GetMapping("/board/{idx}")
-    public Object getBoard(@PathVariable("idx") Long idx) {
-        Map<String, Object> boardAndComment = new HashMap<>();
-        boardAndComment.put("Board", boardService.getBoardOne(idx));
-        //boardAndComment.put("Comment", commentService.getComment(idx, pageNum, pageSize));
-
-        return boardAndComment;
-    }
 
     //게시글 작성 및 파일 업로드
     @Operation(summary = "게시글 작성 및 파일 업로드")

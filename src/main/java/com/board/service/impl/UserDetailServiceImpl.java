@@ -4,6 +4,7 @@ import com.board.domain.User;
 import com.board.exception.AppException;
 import com.board.exception.ErrorCode;
 import com.board.mapper.UserMapper;
+import com.sun.deploy.security.UserDeclinedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +25,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         //Spring Security에서 AutenticationManager가 authenticate()를 통해서 인증을 할 때,
         //지정된 repository에서 인증 대상 객체를 찾아서 Principal 형태로 반환
         User user = userMapper.findUser(id)
-                                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUND, id + " 는 없는 아이디입니다."));
-
+                                .orElseThrow(() -> new UserDeclinedException("[ " + id + " ] 는 없는 아이디입니다."));
         return user;
     }
 

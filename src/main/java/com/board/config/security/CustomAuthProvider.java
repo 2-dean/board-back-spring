@@ -5,6 +5,7 @@ import com.board.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,19 +27,20 @@ public class CustomAuthProvider implements AuthenticationProvider {
         String id = authentication.getName();
         String password = (String) authentication.getCredentials();
 
+        log.info("DB 에 사용자 id 있는지 확인"); // service 에서 예외처리 함
         UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
-        // 비밀번호 확인
-        log.info("비밀번호 일치여부 확인 userDetails {}", userDetails);
+        log.info("비밀번호 일치여부 확인 할 userDetails : \n{}", userDetails);
 
-      if(!encoder.matches(password, userDetails.getPassword())) {
+        try {
+            log.info("입력받은 비밀번호 일치여부 확인");
+            encoder.matches(password, userDetails.getPassword());
+        } catch (NullPointerException e) {
             log.error("비밀번호 일치하지 않음");
-
             throw new AppException(ErrorCode.INVALID_PASSWORD, "비밀번호가 일치하지 않음");
-            //여기서 appException 발생 시키는데 500에러로 끝남 >> 예외처리 필요
-        } else {
-            return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         }
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
 
     }
 
