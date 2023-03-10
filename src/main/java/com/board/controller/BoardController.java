@@ -54,8 +54,8 @@ public class BoardController {
     @GetMapping("/board/{idx}")
     public Object getBoardAndComments(@PathVariable("idx") Long idx) {
         Map<String, Object> boardAndComment = new HashMap<>();
-        boardAndComment.put("Board", boardService.getBoardOne(idx));        // 게시글 정보
-        boardAndComment.put("Comment", commentService.getComments(idx));    // 게시글에 달린 댓글들
+        boardAndComment.put("board", boardService.getBoardOne(idx));        // 게시글 정보
+        boardAndComment.put("comment", commentService.getComments(idx));    // 게시글에 달린 댓글들
 
         return boardAndComment;
     }
