@@ -89,6 +89,7 @@ public class WebSecurityConfig {
                 .and()
                 .authorizeRequests()//요청에 따른 인가 설정
                 .antMatchers("/users/**").permitAll()       // 언제나 접근가능
+                .antMatchers("/aws/**").permitAll()       // 언제나 접근가능
                 .and()
                 .authorizeRequests()
                 .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
