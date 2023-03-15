@@ -24,28 +24,15 @@ public class AttachedFileServiceImpl implements AttachedFileService {
 
     //파일업로드
     @Override
-    public Long saveFile(MultipartFile file) throws IOException {
-
-        String oriFileName = file.getOriginalFilename();
-        String extention = oriFileName.substring(oriFileName.lastIndexOf("."));
-        String saveFileName = UUID.randomUUID().toString() + extention;
-
-        String savePath = PATH + saveFileName;
-
-        // 서버에 파일 저장
-        file.transferTo(new File(savePath));
+    public Long saveFile(AttachedFile attachedFile)  {
 
         // DB에 파일 저장정보 저장
-        AttachedFile attachedFile = new AttachedFile();
-        attachedFile.setOriFileName(oriFileName);
-        attachedFile.setSaveFileName(saveFileName);
-        attachedFile.setSavePath(PATH);
-
         attachedFileMapper.saveFile(attachedFile);
 
+        // 저장하고 바로 idx 가져오기 사용
         Long fileIdx = attachedFile.getIdx();
 
-        System.out.println("file db저장 idx 값 : " + fileIdx);
+        System.out.println("file db 저장 idx 값 : " + fileIdx);
 
         return fileIdx;
 
@@ -55,7 +42,8 @@ public class AttachedFileServiceImpl implements AttachedFileService {
     @Override
     public ResponseEntity<Resource> downloadFile(Long idx) throws FileNotFoundException {
         AttachedFile file = attachedFileMapper.downloadFile(idx);
-        String fileName = file.getSaveFileName();
+        //String fileName = file.getSaveFileName();
+        String fileName = "다운로드 파일이름";
         System.out.println("다운로드 파일이름 : " + fileName);
 
         InputStreamResource resource = new InputStreamResource(new FileInputStream(PATH+ fileName));

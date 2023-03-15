@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface AttachedFileMapper {
 
     //파일 업로드
-    Long saveFile(AttachedFile file);
+    Long saveFile(AttachedFile attachedFile);
     //파일 다운로드
     AttachedFile downloadFile(Long fileIdx);
 

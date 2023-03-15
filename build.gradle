@@ -32,6 +32,8 @@ dependencies {
 	// AWS S3
 	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
 
+
+
 	// jwt
 	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'

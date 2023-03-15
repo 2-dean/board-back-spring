@@ -1,9 +1,11 @@
 package com.board.controller;
 
+import com.board.domain.AttachedFile;
 import com.board.domain.Board;
 import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
 import com.board.service.CommentService;
+import com.board.service.S3FileUploadService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +34,7 @@ public class BoardController {
     private final BoardService boardService;
     private final AttachedFileService attachedFileService;
     private final CommentService commentService;
-
+    private final S3FileUploadService s3FileUploadService;
     //페이지당 수량
     private final int pageSize = 5;
 
@@ -87,13 +89,15 @@ public class BoardController {
     }
 
 
-
     //게시글 작성 및 파일 업로드
     @Operation(summary = "게시글 작성 및 파일 업로드")
     @PostMapping(value = "/board/new", consumes = {"multipart/form-data"})
-    public int newBoardFile(Board board, @RequestParam MultipartFile file) throws IOException {
+    public int newBoardFile(Board board, @RequestParam MultipartFile file) throws Exception {
         if (!file.isEmpty()) {
-            Long fileIdx = attachedFileService.saveFile(file);
+            // AWS S3에 업로드
+            AttachedFile attachedFile = s3FileUploadService.upload(file);
+            // url 을 받아서 DB에 저장
+            Long fileIdx = attachedFileService.saveFile(attachedFile);
             board.setFileIdx(fileIdx);
         }
         return boardService.saveBoard(board);
