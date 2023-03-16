@@ -93,6 +93,10 @@ public class BoardController {
     @Operation(summary = "게시글 작성 및 파일 업로드")
     @PostMapping(value = "/board/new", consumes = {"multipart/form-data"})
     public int newBoardFile(Board board, @RequestParam MultipartFile file) throws Exception {
+        log.info("[ /board/new 받은 값 확인 ]");
+        log.info("board : " + board);
+        log.info("file : " + file);
+
         if (!file.isEmpty()) {
             // AWS S3에 업로드
             AttachedFile attachedFile = s3FileUploadService.upload(file);
