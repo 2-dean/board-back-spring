@@ -1,16 +1,15 @@
 package com.board.controller;
 
 import com.board.domain.User;
-import com.board.dto.UserDTO;
+import com.board.dto.BoardDTO;
 import com.board.service.UserService;
+import com.board.dto.UserDTO;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
@@ -27,14 +26,21 @@ public class UserController {
 
 
     // 로그인 사용자 정보 보내주기
-    @PostMapping
-    public ResponseEntity<User> userInfo(@RequestBody User user) {
-        log.info("user: {}", user.toString());
-        log.info("userInfo 요청 userId : {}", user.getId());
-        User findUser = userService.findUser(user.getId());
+    @PostMapping("/{userId}")
+    public ResponseEntity<UserDTO> userInfo(@PathVariable String userId) {
+        log.info("userInfo 요청 userId : {}", userId);
+
+        User findUser = userService.findUser(userId);
         log.info("findUser : {}", findUser.toString());
 
-        return ResponseEntity.ok(findUser);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setIdx(findUser.getIdx());
+        userDTO.setId(findUser.getId());
+        userDTO.setName(findUser.getName());
+        userDTO.setRole(findUser.getRole());
+
+        log.info("보내줄 USER 정보 : {}", userDTO );
+        return ResponseEntity.ok(userDTO);
     }
 
 

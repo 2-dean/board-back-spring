@@ -6,6 +6,7 @@ import com.board.service.AttachedFileService;
 import com.board.service.BoardService;
 import com.board.service.CommentService;
 import com.board.service.S3FileUploadService;
+import com.board.dto.BoardDTO;
 import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,10 +92,14 @@ public class BoardController {
     //게시글 작성 및 파일 업로드
     @Operation(summary = "게시글 작성 및 파일 업로드")
     @PostMapping(value = "/board/new", consumes = {"multipart/form-data"})
-    public int newBoardFile(Board board, @RequestParam MultipartFile file) throws Exception {
+    public int newBoardFile(BoardDTO boardDTO, @RequestParam MultipartFile file) throws Exception {
         log.info("[ /board/new 받은 값 확인 ]");
-        log.info("board : " + board);
+        log.info("board : " + boardDTO.toString());
         log.info("file : " + file);
+        Board board = new Board();
+        board.setTitle(boardDTO.getTitle());
+        board.setContent(boardDTO.getContent());
+        board.setUserIdx(boardDTO.getUserIdx());
 
         if (!file.isEmpty()) {
             // AWS S3에 업로드

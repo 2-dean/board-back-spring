@@ -4,17 +4,17 @@
 <mapper namespace="com.board.mapper.BoardMapper">
 
     <!-- 게시글 등록-->
-    <insert id="saveBoard" parameterType="Board">
+    <insert id="saveBoard" parameterType="BoardDTO">
         INSERT INTO board (
                title,
                content,
-               name,
+               user_idx,
                file_idx
                )
         VALUES (
                #{title},
                #{content},
-               #{name},
+               #{userIdx},
                #{fileIdx}
                )
     </insert>
@@ -32,16 +32,18 @@
         ORDER BY b.save_date DESC
     </select>
 
-    <select id="getBoardOne" parameterType="Long" resultType="Board">
+    <select id="getBoardOne" parameterType="Long" resultType="BoardVO">
         SELECT b.idx,
                b.title,
                b.content,
                b.name,
                b.save_date,
                b.modify_date,
-               b.file_idx
-        FROM board b
-        WHERE b.idx = #{idx}
+               b.file_idx,
+               f.save_path,
+               f.ori_file_name
+        FROM board b, file f
+        WHERE b.idx = #{idx} AND b.file_idx = f.idx
     </select>
 
 

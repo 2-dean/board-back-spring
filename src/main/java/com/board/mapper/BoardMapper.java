@@ -1,6 +1,7 @@
 package com.board.mapper;
 
 import com.board.domain.Board;
+import com.board.vo.BoardVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface BoardMapper {
     List<Board> getBoardList();
 
     //게시글 번호로 1개 게시글 가져오기
-    Board getBoardOne(Long idx);
+    BoardVO getBoardOne(Long idx);
 
     //검색
     List<Board> findBoardByTitle(String title);

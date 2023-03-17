@@ -42,6 +42,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         try {
             user = objectMapper.readValue(request.getInputStream(), User.class);
+            log.info("입력받은 USER 정보 확인");
+            log.info("ID : " + user.getId() + ", PW : " + user.getPassword());
         } catch (IOException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             throw new RuntimeException("아이디 비밀번호 입력하세요");
@@ -49,7 +51,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(user.getId(), user.getPassword());
-        System.out.println("authenticationToken 객체 : " + authenticationToken.toString());
+        log.info("authenticationToken 객체 : " + authenticationToken.toString());
 
         // 스프링 시큐리티 filter 사용시 AuthenticationManager 를 이용해 SecurityContextHolder 에 저장함
         // AuthenticationManager의 구현체인 ProviderManager 에게 생성한 UsernamePasswordToken 객체를 전달해서 인증한다(SecurityContextHolder 에 저장)

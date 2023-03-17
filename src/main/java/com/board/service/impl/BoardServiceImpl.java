@@ -3,6 +3,7 @@ package com.board.service.impl;
 import com.board.domain.Board;
 import com.board.mapper.BoardMapper;
 import com.board.service.BoardService;
+import com.board.vo.BoardVO;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Object getBoardOne(Long idx) {
-        Board board = boardMapper.getBoardOne(idx);
+        BoardVO board = boardMapper.getBoardOne(idx);
         if (board == null){
             return "게시글 없음";
         } else {

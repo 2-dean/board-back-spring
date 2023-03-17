@@ -27,6 +27,8 @@ public class CustomAuthProvider implements AuthenticationProvider {
         String id = authentication.getName();
         String password = (String) authentication.getCredentials();
 
+        boolean result = false;
+
         log.info("DB 에 사용자 id 있는지 확인"); // service 에서 예외처리 함
         UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
@@ -34,11 +36,20 @@ public class CustomAuthProvider implements AuthenticationProvider {
 
         try {
             log.info("입력받은 비밀번호 일치여부 확인");
-            encoder.matches(password, userDetails.getPassword());
+            result = encoder.matches(password, userDetails.getPassword());
         } catch (NullPointerException e) {
             log.error("비밀번호 일치하지 않음");
             throw new AppException(ErrorCode.INVALID_PASSWORD, "비밀번호가 일치하지 않음");
         }
+
+        if(!result) {
+            log.error("비밀번호 일치하지 않음 ==========> 로그인 불가 ");
+            throw new AppException(ErrorCode.INVALID_PASSWORD, "비밀번호가 일치하지 않음");
+        } else {
+            log.info("비밀번호 일치함 ==========> 로그인");
+        }
+
+
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
 
