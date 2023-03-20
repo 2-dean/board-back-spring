@@ -7,6 +7,7 @@ import com.board.service.BoardService;
 import com.board.service.CommentService;
 import com.board.service.S3FileUploadService;
 import com.board.dto.BoardDTO;
+import com.board.vo.BoardVO;
 import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -92,14 +93,14 @@ public class BoardController {
     //게시글 작성 및 파일 업로드
     @Operation(summary = "게시글 작성 및 파일 업로드")
     @PostMapping(value = "/board/new", consumes = {"multipart/form-data"})
-    public int newBoardFile(BoardDTO boardDTO, @RequestParam MultipartFile file) throws Exception {
+    public int newBoardFile(@ModelAttribute BoardDTO boardDTO, @RequestParam("file") MultipartFile file) throws Exception {
         log.info("[ /board/new 받은 값 확인 ]");
         log.info("board : " + boardDTO.toString());
         log.info("file : " + file);
         Board board = new Board();
         board.setTitle(boardDTO.getTitle());
         board.setContent(boardDTO.getContent());
-        board.setUserIdx(boardDTO.getUserIdx());
+        board.setUserIdx(Long.parseLong(boardDTO.getUserIdx()));
 
         if (!file.isEmpty()) {
             // AWS S3에 업로드

@@ -2,9 +2,11 @@ package com.board.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @ToString
 public class BoardDTO {
     /*계층 간 데이터 교환을 하기 위해 사용하는 객체
@@ -20,12 +22,9 @@ public class BoardDTO {
     private String content;
 
     @Schema(description = "작성자", defaultValue = "", allowableValues = {}, example = "홍길동")
-    private Long userIdx;
+    private String userIdx;
 
     @Schema(description = "이름", nullable = false)
     private String name;
-
-    @Schema(hidden = true)
-    private Long fileIdx;
 
 }
