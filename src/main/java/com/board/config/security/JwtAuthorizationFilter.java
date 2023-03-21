@@ -65,86 +65,87 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         //TODO 특정 url 은 JwtAuthorization Filter 로 들어오지 않도록 처리하기 config 에서 처리 할 수 있는지 확인해보기, 로그인 되어있으면 회원가입 안되기~!
 
         //0. 토큰 꺼내기
-        accessToken = request.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, "");
-        log.info("[ request 에서 accessToken 꺼내기 ] : \n {}", accessToken);
-
-        // TODO null exception 만 발생하는데 !!! 확인하기 >> 비로그인 상태에서 board url 접근 테스트
         try {
-            log.info("[ request 에서 getCookies ] - try ");
+            log.info("[ 1. accessToken 꺼내기 ]===============================");
+            accessToken = request.getHeader("Authorization").replace(JwtProperties.TOKEN_PREFIX, "");
+            log.info("[ accessToken ] : \n {}", accessToken);
+
+            log.info("[ 2. getCookies 가져오기 ] ");
             request.getCookies();
+
+            log.info("[ 3. cookie 에 있는 refreshToken 담기 ] ");
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("refreshToken")) {
+                    refreshToken = cookie.getValue();
+                    log.info("[ refreshToken ] : \n{} ", refreshToken);
+                }
+            }
+
+            log.info("[ 4. accessToken 유효성 검사 ]===============================");
+            jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY);
+            // 1-2. Access 유효함 -> 사용자 정보 SecurityContextHolder 에 저장
+            log.info("[ 5. accessToken 유효함 ]");
+
+
+
+
+            // 토큰 에서 사용자 정보 가져오기
+            String id = jwtUtil.getUserName(accessToken, JwtProperties.ACCESS_SECRET_KEY);
+            log.info("[ 6. accessToken 에서 가져온 사용자 ID : {} ]", id);
+
+            log.info("[ 7. Authentication 객체 생성 및 SecurityContextHolder 에 등록 ]");
+            if (id != null) {
+                User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("해당 id의 User 없음"));
+                //TODO catch 문에서 해결해보기
+                //User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("해당 id의 User 없음"));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+        } catch (ExpiredJwtException e) {
+            log.error("[ ExpiredJwtException 발생! ] accessToken 만료됨 ");
+
+            log.info("[ 1. refreshToken 유효성 검사 =========================]");
+            jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY);
+            log.info(" 2. refreshToken 유효함");
+
+            String id = redisService.getValues(refreshToken);
+            userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
+
+            log.info("========================[ 새 accessToke refresh Token 발급 - START ]========================");
+
+            log.info("[ 3. 새로운 accessToken 발급 및 저장 ]");
+            accessToken = jwtUtil.createAccessToken(id);
+            log.info("[ 4. NEW Access Token : \n{} ", accessToken);
+
+            response.addHeader("Authorization", accessToken);
+            redisService.setAccessValues(accessToken, id);
+            log.info("[ 5. Access Token || response header 에 추가 ]");
+
+            log.info("[ 6. 새로운 refreshToken 발급 및 저장 ]");
+            refreshToken = jwtUtil.createRefreshToken();
+            redisService.setRefreshValues(refreshToken, id);
+            log.info("[ 7. NEW refresh Token : \n{} ]" + refreshToken);
+
+            Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+            response.addCookie(refreshCookie);
+            log.info("[ 8. NEW refresh Token || response Cookie 에 추가");
+
+            log.info ("========================[ 새 accessToke refresh Token 발급 - END ]========================")
+
+            response.setStatus(HttpStatus.NOT_ACCEPTABLE.value()); //Not Acceptable(접수할 수 없음) === 406
+            filterChain.doFilter(request, response);
+
+            log.error("[ !!! refreshToken Expired : 다시로그인필요 =========================]");
+            response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+            //logout 호출
+            filterChain.doFilter(request, response);
+
         } catch (NullPointerException e) {
             log.info("[ refresh Token 가져오기 request.getCookies ] >> 쿠키없음");
             response.setStatus(HttpStatus.FORBIDDEN.value());
         }
 
-        log.info("[ refreshToken 담기 ] - tryCatch 이후 ");
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals("refreshToken")) {
-                refreshToken = cookie.getValue();
-                log.info("[ refreshToken 확인 ] : \n{} ", refreshToken);
-            }
-        }
+    }//doFilterInternal()
 
-
-        //1. Access 토큰 만료 확인
-        try {
-            log.info("[ accessToken 유효성 검사 ]===============================");
-            jwtUtil.isExpired(accessToken, JwtProperties.ACCESS_SECRET_KEY);
-
-            // 1-2. Access 유효함 -> 사용자 정보 SecurityContextHolder 에 저장
-            log.info("[ @ accessToken 유효함]");
-
-            // 토큰 에서 사용자 정보 가져오기
-            String id = jwtUtil.getUserName(accessToken, JwtProperties.ACCESS_SECRET_KEY);
-            log.info("accessToken 에서 가져온 사용자 ID : {}", id);
-
-            // Authentication 객체 생성 및 SecurityContextHolder 에 등록
-            if (id != null) {
-                User user = userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("해당 id의 User 없음"));
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-            filterChain.doFilter(request, response);
-
-        } catch (ExpiredJwtException e) {
-            log.error("[ !!! accessToken Expired =========================]");
-            try {
-                log.info("[refreshToken 유효성 검사]");
-                jwtUtil.isExpired(refreshToken, JwtProperties.REFRESH_SECRET_KEY);
-                log.info("[GOOD] refreshToken 유효함");
-
-                String id = redisService.getValues(refreshToken);
-                userMapper.findUser(id).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
-
-                log.info("========================[ refresh Token 발급 ]========================");
-
-                // 새로운 accessToken 발급 및 저장
-                accessToken = jwtUtil.createAccessToken(id);
-                log.info("[NEW] Access Token : \n{} ", accessToken);
-
-                response.addHeader("Authorization", accessToken);
-                redisService.setAccessValues(accessToken, id);
-                log.info("[NEW] Access Token || response header 에 추가");
-
-                // 새로운 refreshToken 발급 및 저장
-                refreshToken = jwtUtil.createRefreshToken();
-                redisService.setRefreshValues(refreshToken, id);
-                log.info("[NEW] refresh Token : \n{}" + refreshToken);
-
-                Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-                response.addCookie(refreshCookie);
-                log.info("[NEW] refresh Token || response Cookie 에 추가");
-
-                response.setStatus(HttpStatus.NOT_ACCEPTABLE.value()); //Not Acceptable(접수할 수 없음) === 406
-
-
-            } catch (ExpiredJwtException exception) {
-                log.error("[ !!! refreshToken Expired : 다시로그인필요 =========================]");
-                response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
-                //logout 호출
-            }
-        }
-
-        }//doFilterInternal
-
-}
+} // class

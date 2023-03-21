@@ -59,7 +59,6 @@ public class BoardController {
         Map<String, Object> boardAndComment = new HashMap<>();
         boardAndComment.put("board", boardService.getBoardOne(idx));        // 게시글 정보
         boardAndComment.put("comment", commentService.getComments(idx));    // 게시글에 달린 댓글들
-
         return boardAndComment;
     }
 
@@ -105,9 +104,10 @@ public class BoardController {
         if (!file.isEmpty()) {
             // AWS S3에 업로드
             AttachedFile attachedFile = s3FileUploadService.upload(file);
-            // url 을 받아서 DB에 저장
+            log.info("url 을 받아서 DB에 저장");
             Long fileIdx = attachedFileService.saveFile(attachedFile);
             board.setFileIdx(fileIdx);
+            log.info("board에 저장 될 객체확인 : {}",board);
         }
         return boardService.saveBoard(board);
     }

@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -73,11 +74,15 @@ public class WebSecurityConfig {
         return source;
     }
 
+
+
+
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         return http
                 .csrf().disable()       //cross site 기능
-
+                .headers()
+                .and()
                 .formLogin().disable()  // formLogin 대신 Jwt를 사용
                 .httpBasic().disable()  // httpBasic 방식 대신 Jwt를 사용
                 .cors().configurationSource(corsConfigurationSource())                 //cross site -> 도메인이 다를때 허용해줌?
@@ -88,12 +93,12 @@ public class WebSecurityConfig {
 
                 .and()
                 .authorizeRequests()//요청에 따른 인가 설정
-                .antMatchers("/users/**").permitAll()       // 언제나 접근가능
+                .antMatchers("/user/**").permitAll()       // 언제나 접근가능
                 .antMatchers("/aws/**").permitAll()       // 언제나 접근가능
+                .antMatchers(HttpMethod.GET, "/main", "/login-page").permitAll()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/boards/**").authenticated()  // boards/** 요청은 인증필요
-                .antMatchers(HttpMethod.GET, "/main", "/login-page", "/users/join").permitAll()
 
                 .and()
                 .addFilter(new AuthenticationFilter((CustomAuthProvider) authenticationProvider(), redisService, jwtUtil))

@@ -1,8 +1,6 @@
 package com.board.util;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -50,13 +48,21 @@ public class JwtUtil{ // JWT 생성, 디코딩, 만료
      * @param token
      * @return
      */
-    public void isExpired(String token, String key) throws ExpiredJwtException {
+    public boolean isExpired(String token, String key) {
         log.info("[ JwUtil.isExpired ]========================");
         log.info("[ 만료 확인할 token : \n{}", token);
 
-            Jwts.parser()
+            Jws<Claims> claims = Jwts.parser()
                 .setSigningKey(key)
                 .parseClaimsJws(token);
+
+            if(claims.getBody().getExpiration().before(new Date())){
+                log.info("만료됨?");
+                return true;
+            } else {
+                log.info("유효함?");
+                return false;
+            }
 
     }
 
